@@ -1,7 +1,7 @@
 // src/lib/smartAccountClient.ts
 import { createSmartAccountClient } from "permissionless";
 import { http } from "viem";
-import { baseSepolia } from "viem/chains";
+import { baseSepolia,anvil } from "viem/chains";
 import { pimlicoClient, pimlicoBundlerUrl } from "./pimlico";
 import { CustomSmartAccount } from "./customSmartAccount";
 
@@ -10,7 +10,7 @@ export async function getSmartAccountClient(
 ) {
   return createSmartAccountClient({
     account: customSmartAccount,
-    chain: baseSepolia,
+    chain: anvil,
     bundlerTransport: http(pimlicoBundlerUrl),
     paymaster: pimlicoClient, // optional
     userOperation: {

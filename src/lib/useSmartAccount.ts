@@ -13,9 +13,7 @@ export function useSmartAccount() {
   const [error, setError] = useState<Error | null>(null);
   const { ready, authenticated, user } = usePrivy();
   const { wallets } = useWallets();
-  const embeddedWallet = wallets?.find(
-    (wallet) => wallet.walletClientType === "privy"
-  );
+  const embeddedWallet = wallets[0];
   const {initCustomAccount,isLoading:isClientReady,error:clientError} = useCustomSmartAccount();
 
   
@@ -33,6 +31,7 @@ export function useSmartAccount() {
     if (isClientReady) {
       throw new Error("Smart Account Client is still loading");
     }
+    console.log("Initializing Smart Account Client...");
     try {
       const customSmartAccount = await initCustomAccount();
       if (!customSmartAccount) {

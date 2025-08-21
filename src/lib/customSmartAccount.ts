@@ -22,7 +22,8 @@ export default function useCustomSmartAccount() {
   const [customSmartAccount, setCustomSmartAccount] =
     useState<CustomSmartAccount | null>(null);
   const { wallets } = useWallets();
-  const owner = wallets?.find((wallet) => wallet.walletClientType === "privy");
+  const owner = wallets[0];
+
   const { signMessage: privySignMessage } = useSignMessage();
   const { signTypedData: privySignTypedData } = useSignTypedData();
   const [isLoading, setIsLoading] = useState(false);
