@@ -152,5 +152,5 @@ export function useActivateWallet() {
     }
   }
 
-  return handleActivateWallet;
+  return validateDirectly;
 }
