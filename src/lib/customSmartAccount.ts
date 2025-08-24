@@ -114,7 +114,7 @@ export default function useCustomSmartAccount() {
           }) as Promise<bigint>;
         },
         async getStubSignature() {
-          return toHex(new Uint8Array(65));
+          return "0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c" as `0x${string}`;
         },
         async signMessage({ message }) {
           const msgStr =
@@ -145,6 +145,8 @@ export default function useCustomSmartAccount() {
           return signature as `0x${string}`;
         },
         async signUserOperation(userOperation) {
+          console.log("Signing user operation:", userOperation);
+
           const uoForHash = {
             sender: userOperation.sender as `0x${string}`,
             nonce: userOperation.nonce,
@@ -156,24 +158,24 @@ export default function useCustomSmartAccount() {
             maxFeePerGas: userOperation.maxFeePerGas!,
             maxPriorityFeePerGas: userOperation.maxPriorityFeePerGas!,
             paymasterAndData: userOperation.paymasterAndData ?? "0x",
-            signature: "0x", // ignored in hash but required by ABI
+            signature: "0x",
           } as const;
+
           const userOpHash = await publicClient.readContract({
             address: ENTRY_POINT_ADDR,
             abi: ENTRYPOINT_ABI,
             functionName: "getUserOpHash",
             args: [uoForHash],
           });
-          const ethSigned = hashMessage(userOpHash as `0x${string}`);
-          let signature = await provider?.request({
-            method: "personal_sign",
-            params: [ethSigned,owner.address],
+
+          console.log("User operation hash:", userOpHash);
+          const { signature } = await privySignMessage({
+            message: userOpHash as `0x${string}`,
           });
 
-          console.log("signature from provider:", signature);
-          const normalizedSignature = normalizeSignature(signature);
-          console.log("normalizedSignature:", normalizedSignature);
-          return normalizedSignature as `0x${string}`;
+
+          console.log("User Op HASH:", userOpHash);
+          return signature as `0x${string}`;
         },
       });
       setCustomSmartAccount(account);

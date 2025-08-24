@@ -1,0 +1,147 @@
+async function simulateUserOperation() {
+  const ENTRY_POINT = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";
+  const ENTRYPOINT_ABI_TYPED = ENTRYPOINT_ABI as any;
+
+  const smartAccountClient = await initClient();
+  const provider = await owner?.getEthereumProvider();
+  const account = smartAccountClient?.account;
+  if (!account || !provider || !owner) throw new Error("missing prerequisites");
+
+  const callData = await account.encodeCalls([{ to: account.address, data: "0x", value: 0n }]);
+  const sender = await account.getAddress();
+
+  // compute initCode only if account not deployed
+  const code = await publicClient.getCode({ address: sender as `0x${string}` });
+  let initCode = "0x";
+  if (code === "0x") {
+    const factoryArgs = await account.getFactoryArgs();
+    initCode = (factoryArgs!.factory as string) + factoryArgs!.factoryData!.slice(2);
+  }
+
+  const uoForHash = {
+    sender,
+    nonce: 0n,
+    initCode,
+    callData,
+    callGasLimit: 1_000_000n,
+    verificationGasLimit: 1_000_000n,
+    preVerificationGas: 21000n,
+    maxFeePerGas: BigInt(1007137),
+    maxPriorityFeePerGas: BigInt(1_000_000),
+    paymasterAndData: "0x",
+    signature: "0x",
+  };
+
+  // 1) canonical userOpHash
+  const userOpHash = await publicClient.readContract({
+    address: ENTRY_POINT,
+    abi: ENTRYPOINT_ABI_TYPED,
+    functionName: "getUserOpHash",
+    args: [uoForHash],
+  });
+  console.log("userOpHash:", userOpHash);
+
+  // 2) ask provider to sign the **raw userOpHash with personal_sign** (provider will prefix internally)
+  // personal_sign(msg, addr) signs: keccak("\x19Ethereum Signed Message:\n" + len(msg) + msg)
+  const rawResp = await provider.request({
+    method: "personal_sign",
+    params: [userOpHash, owner.address],
+  }).catch(async (e) => {
+    // some wallets use reversed param order
+    return await provider.request({ method: "personal_sign", params: [owner.address, userOpHash] });
+  });
+  console.log("raw provider sig:", rawResp);
+
+  // 3) normalize + canonicalize (r||s||v) -> 65 bytes hex "0x..."
+  const providerSig = normalizeAndCanonicalizeSignature(rawResp);
+  console.log("normalized sig:", providerSig);
+
+  // sanity: locally recover from the prefixed hash and signature (what the contract will verify)
+  const prefixedHash = hashMessage(userOpHash as `0x${string}`); // equals toEthSignedMessageHash(userOpHash)
+  const recovered = await recoverAddress({ hash: prefixedHash, signature: providerSig });
+  console.log("recovered:", recovered, "owner:", owner.address);
+  if (recovered.toLowerCase() !== owner.address.toLowerCase()) {
+    console.warn("Recovered != owner — aborting simulateValidation");
+    return false;
+  }
+
+  // attach normalized signature into userOp and call simulateValidation
+  uoForHash.signature = providerSig;
+  try {
+    const res = await publicClient.readContract({
+      address: ENTRY_POINT,
+      abi: ENTRYPOINT_ABI_TYPED,
+      functionName: "simulateValidation",
+      args: [uoForHash],
+    });
+    console.log("simulateValidation result:", res);
+    return true;
+  } catch (err) {
+    console.error("simulateValidation revert:", err);
+    return false;
+  }
+}
+
+
+//These are all the logs
+Signing user operation: {account: {…}, sender: '0x1Edeb65c384478a9e3d03D4cB30B5d8feAB5b7d7', callData: '0xb61d27f60000000000000000000000009e36791f16d17aea…0000000000000000000000000000000000000000000000000', initCode: '0x', maxFeePerGas: 1100074n, …}account: {client: {…}, entryPoint: {…}, decodeCalls: ƒ, encodeCalls: ƒ, getAddress: ƒ, …}callData: "0xb61d27f60000000000000000000000009e36791f16d17aea202615bda91c02a761ac5b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000"callGasLimit: 96564ninitCode: "0x"maxFeePerGas: 1100074nmaxPriorityFeePerGas: 1100000nnonce: 0npaymasterAndData: "0x6666666666667849c56f2850848ce1c4da65c68b01000068a89e3c000000000000300ed9b953f0cb53d70e264f4e09ca883d94c96b1251da12a6fce02b459c70d408c542211481d4a7ba3f2cd55bb9e9dfb17584f9cdb5fbe07eef896155c961161b"paymasterPostOpGasLimit: undefinedpaymasterVerificationGasLimit: undefinedpreVerificationGas: 55070nsender: "0x1Edeb65c384478a9e3d03D4cB30B5d8feAB5b7d7"signature: "0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c"verificationGasLimit: 129271n[[Prototype]]: Object
+User operation for hash: 
+{sender: '0x1Edeb65c384478a9e3d03D4cB30B5d8feAB5b7d7', nonce: 0n, initCode: '0x', callData: '0xb61d27f60000000000000000000000009e36791f16d17aea…0000000000000000000000000000000000000000000000000', callGasLimit: 96564n, …}
+callData
+: 
+"0xb61d27f60000000000000000000000009e36791f16d17aea202615bda91c02a761ac5b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000"
+callGasLimit
+: 
+96564n
+initCode
+: 
+"0x"
+maxFeePerGas
+: 
+1100074n
+maxPriorityFeePerGas
+: 
+1100000n
+nonce
+: 
+0n
+paymasterAndData
+: 
+"0x6666666666667849c56f2850848ce1c4da65c68b01000068a89e3c000000000000300ed9b953f0cb53d70e264f4e09ca883d94c96b1251da12a6fce02b459c70d408c542211481d4a7ba3f2cd55bb9e9dfb17584f9cdb5fbe07eef896155c961161b"
+preVerificationGas
+: 
+55070n
+sender
+: 
+"0x1Edeb65c384478a9e3d03D4cB30B5d8feAB5b7d7"
+signature
+: 
+"0x"
+verificationGasLimit
+: 
+129271n
+[[Prototype]]
+: 
+Object
+
+User operation hash: 0x33a1f6f02e240ee927711786241dda4028a802ef27dd974fa61035c0f5dc6063
+ Eth signed hash: 0x6770aecc2d4f009d3d97dffb88394418ae3ed6dbf4cbd14181aeb53c32d9b5d9
+
+ Raw signature from provider: 0xff03cfd84a293f4b82ceca2570a554598e1d4752ad83e9008578520545692afe625e7d61378be38ac96c8f36e734c2adbbd1a9ccbe7eaed7793559e1c0ebce261c
+customSmartAccount.ts:185 Normalized signature: 0xff03cfd84a293f4b82ceca2570a554598e1d4752ad83e9008578520545692afe625e7d61378be38ac96c8f36e734c2adbbd1a9ccbe7eaed7793559e1c0ebce261c
+useActivateWallet.ts:44 Error activating wallet UserOperationExecutionError: UserOperation rejected because account signature check failed (or paymaster signature, if the paymaster uses its data as signature).
+
+Request Arguments:
+  callData:              0xb61d27f60000000000000000000000009e36791f16d17aea202615bda91c02a761ac5b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000
+  callGasLimit:          96564
+  initCode:              0x
+  maxFeePerGas:          0.001100074 gwei
+  maxPriorityFeePerGas:  0.0011 gwei
+  nonce:                 0
+  paymasterAndData:      0x6666666666667849c56f2850848ce1c4da65c68b01000068a89e3c000000000000300ed9b953f0cb53d70e264f4e09ca883d94c96b1251da12a6fce02b459c70d408c542211481d4a7ba3f2cd55bb9e9dfb17584f9cdb5fbe07eef896155c961161b
+  preVerificationGas:    55070
+  sender:                0x1Edeb65c384478a9e3d03D4cB30B5d8feAB5b7d7
+  signature:             0xff03cfd84a293f4b82ceca2570a554598e1d4752ad83e9008578520545692afe625e7d61378be38ac96c8f36e734c2adbbd1a9ccbe7eaed7793559e1c0ebce261c
+  verificationGasLimit:  129271
+
+Details: Invalid UserOperation signature or paymaster signature

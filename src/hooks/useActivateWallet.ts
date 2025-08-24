@@ -4,7 +4,14 @@ import { toast } from "sonner";
 import { usePrivy, useSignMessage, useWallets } from "@privy-io/react-auth";
 import { publicClient } from "@/lib/pimlico";
 import { ENTRYPOINT_ABI, SMART_ACCOUNT_ABI } from "@/lib/contracts";
-import { encodeFunctionData, hashMessage, recoverAddress } from "viem";
+import {
+  encodeFunctionData,
+  hashMessage,
+  recoverAddress,
+  recoverMessageAddress,
+  hexToBytes,
+  keccak256,
+} from "viem";
 import { normalizeAndCanonicalizeSignature } from "@/lib/helpers";
 
 export function useActivateWallet() {
@@ -12,7 +19,6 @@ export function useActivateWallet() {
   const { user } = usePrivy();
   const { wallets } = useWallets();
   const owner = wallets?.find((wallet) => wallet.walletClientType === "privy");
-  const { signMessage: privySignMessage } = useSignMessage();
   async function handleActivateWallet() {
     try {
       const smartAccountClient = await initClient();
@@ -41,6 +47,6 @@ export function useActivateWallet() {
   }
 
 
+
   return handleActivateWallet;
 }
-
