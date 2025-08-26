@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+
 export const SMART_ACCOUNT_ABI = [
   {
     type: "fallback",
@@ -1816,8 +1818,8 @@ export const ENTRYPOINT_ABI = [
   { stateMutability: "payable", type: "receive" },
 ] as const;
 
-// Contract addresses - replace with your deployed addresses
 export const CONTRACT_ADDRESSES = {
   ACCOUNT_FACTORY:
     "0x5D16F29E70e90ac48C7F4fb2c1145911a774eFbF" as `0x${string}`, //base sepolia
 };
+

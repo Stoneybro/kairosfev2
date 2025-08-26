@@ -1,11 +1,8 @@
-"use client"
+"use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { TaskTableData } from "@/lib/types";
-import { Badge } from "../ui/badge";
-import { Dot } from "lucide-react";
-import { GoDotFill } from "react-icons/go";
+import { Badge } from "../../ui/badge";
 import { statusMap } from "@/lib/types";
-
 
 export const columns: ColumnDef<TaskTableData>[] = [
   {
@@ -19,17 +16,15 @@ export const columns: ColumnDef<TaskTableData>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({getValue})=>{
-      const value=getValue<number>()
-      const status=statusMap[value]??{label:"unknown",color:""}
-      return(
-        <Badge variant={"outline"} className="flex items-center">
-          {/* <GoDotFill  className={`${status.color} !w-4 !h-4 `} /> */}
+    cell: ({ getValue }) => {
+      const value = getValue<number>();
+      const status = statusMap[value] ?? { label: "unknown", color: "" };
+      return (
+        <Badge variant={"outline"} className='flex items-center'>
           {status.label}
         </Badge>
-      )
-    }
-
+      );
+    },
   },
   {
     accessorKey: "deadline",

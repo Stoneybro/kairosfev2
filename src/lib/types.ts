@@ -35,7 +35,7 @@ export type TaskType = {
 };
 export type TaskTableData = {
   id: bigint;
-  title: string;
+ title: string;
   rewardAmount: string | bigint; // Use string for large numbers
   deadline: string | bigint; // Use string for large numbers
   status: number;

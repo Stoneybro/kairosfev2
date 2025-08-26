@@ -5,8 +5,17 @@ import { FcGoogle } from "react-icons/fc";
 import { SiGmail } from "react-icons/si";
 import { IoWallet } from "react-icons/io5";
 import { FaGithub } from "react-icons/fa";
+import SvgLoading from "./svg-loading";
+import { useRouter } from "next/router";
+import { usePrivy } from "@privy-io/react-auth";
 export default function LoginForm() {
+  const {ready}=usePrivy()
   const {login}=useLogin()
+  if(!ready) return(
+    <div className="w-full flex justify-center items-center">
+    <div className="max-w-xs"><SvgLoading /></div>
+    </div>
+  ) 
   return (
     <div className={"flex flex-col gap-6"} >
       <div className='flex flex-col items-center gap-2 text-center'>
