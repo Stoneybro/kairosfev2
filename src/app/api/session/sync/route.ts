@@ -1,13 +1,33 @@
-// app/api/session/sync/route.ts (server)
 import { NextResponse } from "next/server";
-import { privyVerify, privyClint } from "@/lib/auth/privy-server"; // fixed typo
+import { privyVerify, privyClient } from "@/lib/auth/privy-server";
 import { readContract } from "@/hooks/web3/server";
 import {
   CONTRACT_ADDRESSES,
   ACCOUNT_FACTORY_ABI,
 } from "@/lib/contracts/contracts";
 
+const ZERO = "0x0000000000000000000000000000000000000000";
+
+// cookie settings
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+const COOKIE_SECURE = process.env.NODE_ENV === "production";
+
 export async function POST(req: Request) {
+  // enforce method and basic origin/referrer checks in production
+  const reqUrl = new URL(req.url);
+  if (process.env.NODE_ENV === "production") {
+    const origin = req.headers.get("origin");
+    const referer = req.headers.get("referer");
+    const requestOrigin = reqUrl.origin;
+
+    const originOk = origin ? origin === requestOrigin : false;
+    const refererOk = referer ? referer.startsWith(requestOrigin) : false;
+
+    if (!originOk && !refererOk) {
+      return NextResponse.json({ error: "invalid-origin" }, { status: 403 });
+    }
+  }
+
   // verify session
   const session = await privyVerify();
   if (!session) {
@@ -31,7 +51,7 @@ export async function POST(req: Request) {
   const userId = session.userId;
   let user;
   try {
-    user = await privyClint.getUserByWalletAddress(walletAddress); // verify method exists
+    user = await privyClient.getUserByWalletAddress(walletAddress);
   } catch (err) {
     console.error("Privy API error:", err);
     return NextResponse.json({ error: "privy-lookup-failed" }, { status: 500 });
@@ -55,47 +75,41 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "chain-read-failed" }, { status: 500 });
   }
 
-  // runtime validation for hex string
   const smartAccountAddress =
-    typeof rawRes === "string" && rawRes.startsWith("0x")
-      ? (rawRes as `0x${string}`)
-      : "0x0000000000000000000000000000000000000000";
+    typeof rawRes === "string" && rawRes.startsWith("0x") ? rawRes : ZERO;
 
-  const isActivated =
-    smartAccountAddress !== "0x0000000000000000000000000000000000000000" ||
-    undefined;
+  const isActivated = smartAccountAddress !== ZERO;
 
   const res = NextResponse.json({
     ok: true,
     activated: isActivated,
   });
 
-  // set hardened cookies
+  // set hardened cookies with explicit lifetime and env-aware secure flag
+  const cookieOptions = {
+    httpOnly: true,
+    secure: COOKIE_SECURE,
+    sameSite: "strict" as const,
+    path: "/",
+    maxAge: COOKIE_MAX_AGE,
+  };
+
   res.cookies.set({
     name: "user_wallet",
     value: walletAddress.toLowerCase(),
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    path: "/",
+    ...cookieOptions,
   });
 
   res.cookies.set({
     name: "user_wallet_activated",
     value: isActivated ? "1" : "0",
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    path: "/",
+    ...cookieOptions,
   });
 
   res.cookies.set({
-    name: "smart_wallet", // fixed naming to be consistent
+    name: "smart_wallet",
     value: smartAccountAddress,
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    path: "/",
+    ...cookieOptions,
   });
 
   return res;

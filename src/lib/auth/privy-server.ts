@@ -2,14 +2,14 @@
 
 import { PrivyClient } from "@privy-io/server-auth";
 import { cookies } from "next/headers";
-export const privyClint = new PrivyClient(
+export const privyClient = new PrivyClient(
   process.env.NEXT_PRIVY_APP_ID!,
   process.env.NEXT_PRIVY_APP_SECRET!
 );
 export async function verifyToken(token?: string | null) {
   if (!token) return null;
   try {
-    return await privyClint.verifyAuthToken(token);
+    return await privyClient.verifyAuthToken(token);
   } catch (err) {
     console.warn("privy: token verify failed", err);
     return null;
