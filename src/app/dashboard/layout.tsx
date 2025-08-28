@@ -1,10 +1,10 @@
 "use client";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { WalletSidebar } from "@/components/walletComponents/walletsidebar";
+import { WalletSidebar } from "@/components/wallet/walletSidebar";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
-import SvgLoading from "@/components/svg-loading";
+import SvgLoading from "@/components/ui/svg-loading";
 import { useEffect } from "react";
 export default function Dashboard({
   children,

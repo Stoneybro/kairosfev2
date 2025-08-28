@@ -1,9 +1,9 @@
 //login/page.tsx
 import Image from "next/image";
 import Link from "next/link";
-import LoginForm from "../../components/LoginForm";
-import SyncWalletAfterLogin from "@/components/syncWallet";
-import { redirect } from "next/navigation";
+import LoginForm from "@/components/login/LoginForm";
+import SyncWalletAfterLogin from "@/lib/auth/syncWallet";
+
 export default async function LoginPage() {
   return (
     <div className='grid min-h-svh lg:grid-cols-2 relative'>

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 
 
 import { Button } from '../ui/button';
-import { ThemeToggle } from './theme-toggle';
+import { ThemeToggle } from './themetToggle';
 
 export default function WalletSettings () {
   const [logOut,setLogOut]=useState<"LogOut"|"Logging Out">("LogOut")

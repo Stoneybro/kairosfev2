@@ -3,7 +3,7 @@ import { useSmartAccount } from "@/lib/useSmartAccount";
 import { toast } from "sonner";
 import { usePrivy, useSignMessage, useWallets } from "@privy-io/react-auth";
 import { publicClient } from "@/lib/pimlico";
-import { ENTRYPOINT_ABI, SMART_ACCOUNT_ABI } from "@/lib/contracts";
+import { ENTRYPOINT_ABI, SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
 import {
   encodeFunctionData,
   hashMessage,
@@ -12,7 +12,7 @@ import {
   hexToBytes,
   keccak256,
 } from "viem";
-import { normalizeAndCanonicalizeSignature } from "@/lib/helpers";
+import { normalizeAndCanonicalizeSignature } from "@/utils/helpers";
 
 export function useActivateWallet() {
   const { initClient } = useSmartAccount();
@@ -45,8 +45,6 @@ export function useActivateWallet() {
       return false;
     }
   }
-
-
 
   return handleActivateWallet;
 }

@@ -1,23 +1,25 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/button";
 import { useLogin } from "@privy-io/react-auth";
 import { FcGoogle } from "react-icons/fc";
 import { SiGmail } from "react-icons/si";
 import { IoWallet } from "react-icons/io5";
 import { FaGithub } from "react-icons/fa";
-import SvgLoading from "./svg-loading";
-import { useRouter } from "next/router";
+import SvgLoading from "../ui/svg-loading";
 import { usePrivy } from "@privy-io/react-auth";
 export default function LoginForm() {
-  const {ready}=usePrivy()
-  const {login}=useLogin()
-  if(!ready) return(
-    <div className="w-full flex justify-center items-center">
-    <div className="max-w-xs"><SvgLoading /></div>
-    </div>
-  ) 
+  const { ready } = usePrivy();
+  const { login } = useLogin();
+  if (!ready)
+    return (
+      <div className='w-full flex justify-center items-center'>
+        <div className='max-w-xs'>
+          <SvgLoading />
+        </div>
+      </div>
+    );
   return (
-    <div className={"flex flex-col gap-6"} >
+    <div className={"flex flex-col gap-6"}>
       <div className='flex flex-col items-center gap-2 text-center'>
         <h1 className='text-4xl font-bold'>Welcome Back!</h1>
         <p className='text-muted-foreground text-sm text-balance'>
@@ -25,15 +27,27 @@ export default function LoginForm() {
         </p>
       </div>
       <div className='grid gap-6'>
-        <Button onClick={() => login({loginMethods:["google"]})}  variant='outline' className='w-full'>
+        <Button
+          onClick={() => login({ loginMethods: ["google"] })}
+          variant='outline'
+          className='w-full'
+        >
           <FcGoogle />
           Login with Google
         </Button>
-        <Button onClick={() => login({loginMethods:["email"]})}  variant='outline' className='w-full'>
+        <Button
+          onClick={() => login({ loginMethods: ["email"] })}
+          variant='outline'
+          className='w-full'
+        >
           <SiGmail />
           Login with Email
         </Button>
-        <Button onClick={() => login({loginMethods:["github"]})}  variant='outline' className='w-full'>
+        <Button
+          onClick={() => login({ loginMethods: ["github"] })}
+          variant='outline'
+          className='w-full'
+        >
           <FaGithub />
           Login with GitHub
         </Button>
@@ -42,7 +56,11 @@ export default function LoginForm() {
             Or continue with
           </span>
         </div>
-        <Button onClick={() => login({loginMethods:["wallet"]})}  variant='outline' className='w-full'>
+        <Button
+          onClick={() => login({ loginMethods: ["wallet"] })}
+          variant='outline'
+          className='w-full'
+        >
           <IoWallet />
           Connect Wallet
         </Button>

@@ -3,7 +3,7 @@ import { ArrowUpDown, QrCode } from "lucide-react";
 import { CiMoneyCheck1 } from "react-icons/ci";
 import React from "react";
 import { Button } from "../ui/button";
-import { activeTabType } from "@/lib/types";
+import { activeTabType } from "@/types";
 type WalletHomeProps = {
   setActiveTab: (tab: activeTabType) => void;
 };
@@ -33,18 +33,30 @@ export default function WalletHome({ setActiveTab }: WalletHomeProps) {
       {/* Action Buttons Grid */}
       <div className='w-full max-w-sm space-y-4'>
         {/* Top Row */}
-        <Button variant={"outline"} onClick={() => setActiveTab("receive")} className='w-full '>
-          <QrCode  />
+        <Button
+          variant={"outline"}
+          onClick={() => setActiveTab("receive")}
+          className='w-full '
+        >
+          <QrCode />
           <span className=' font-medium'>receive</span>
         </Button>
         <div className='grid grid-cols-2 gap-4'>
-          <Button onClick={() =>setActiveTab("deposit")} variant={"outline"} className='w-full'>
-           <CiMoneyCheck1  />
+          <Button
+            onClick={() => setActiveTab("deposit")}
+            variant={"outline"}
+            className='w-full'
+          >
+            <CiMoneyCheck1 />
             <span className=' font-medium'>Deposit</span>
           </Button>
 
-          <Button onClick={() => setActiveTab("send")} variant={"outline"} className='w-full'>
-            <ArrowUpDown  />
+          <Button
+            onClick={() => setActiveTab("send")}
+            variant={"outline"}
+            className='w-full'
+          >
+            <ArrowUpDown />
             <span className=' font-medium'>Send</span>
           </Button>
         </div>

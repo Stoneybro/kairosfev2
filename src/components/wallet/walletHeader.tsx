@@ -1,10 +1,7 @@
 "use client";
 import React from "react";
 import { useState } from "react";
-import {
-  HiChevronLeft,
-  HiOutlineChevronDown,
-} from "react-icons/hi2";
+import { HiChevronLeft, HiOutlineChevronDown } from "react-icons/hi2";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,20 +11,20 @@ import {
 import { X } from "lucide-react";
 import CopyText from "../ui/copy";
 import { useSidebar } from "../ui/sidebar";
-import { activeTabType } from "@/lib/types";
+import { activeTabType } from "@/types";
 type WalletHeaderProps = {
   setActiveTab: (tab: activeTabType) => void;
 };
 
-export default function WalletHeader({setActiveTab}:WalletHeaderProps) {
-    const [isOpen, setIsOpen] = useState(false);
-    const {setOpenMobile,setOpen}=useSidebar()
+export default function WalletHeader({ setActiveTab }: WalletHeaderProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const { setOpenMobile, setOpen } = useSidebar();
   return (
     <div className='flex justify-center items-center h-full w-full'>
       <div className='flex-2 flex items-center justify-center'>
         {
           <Button
-           onClick={()=>setActiveTab("home")}
+            onClick={() => setActiveTab("home")}
             variant='secondary'
             className='h-10 w-10 rounded-full bg-muted flex items-center justify-center border'
           >
@@ -59,11 +56,9 @@ export default function WalletHeader({setActiveTab}:WalletHeaderProps) {
               <div className='flex justify-between '>
                 <div className='flex gap-3  items-center '>
                   0x1Edeb...B5b7d7
-                <CopyText text={"0x1Edeb...B5b7d7"} />
+                  <CopyText text={"0x1Edeb...B5b7d7"} />
                 </div>
-                <div className=''>
-                  1 ETH
-                </div>
+                <div className=''>1 ETH</div>
               </div>
             </div>
 
@@ -71,8 +66,8 @@ export default function WalletHeader({setActiveTab}:WalletHeaderProps) {
               <div className='text-muted-foreground text-sm'>Smart Wallet</div>
               <div className='flex justify-between'>
                 <div className='flex gap-3 items-center'>
-                   0x1Edeb...B5b7d7
-                 <CopyText text={"0x1Edeb...B5b7d7"} />
+                  0x1Edeb...B5b7d7
+                  <CopyText text={"0x1Edeb...B5b7d7"} />
                 </div>
                 <div className=''>0.01 ETH</div>
               </div>

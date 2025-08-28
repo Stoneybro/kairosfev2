@@ -83,3 +83,18 @@ export  function normalizeAndCanonicalizeSignature(resp: unknown): `0x${string}`
     const vhex = v.toString(16).padStart(2, "0");
     return ("0x" + r + shex + vhex) as `0x${string}`;
   }
+
+export  function toSerializable(obj: any): any {
+  if (typeof obj === "bigint") {
+    return obj.toString();
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(toSerializable);
+  }
+  if (obj && typeof obj === "object") {
+    return Object.fromEntries(
+      Object.entries(obj).map(([k, v]) => [k, toSerializable(v)])
+    );
+  }
+  return obj;
+}

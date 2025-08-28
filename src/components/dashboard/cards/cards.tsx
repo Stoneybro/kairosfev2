@@ -11,9 +11,8 @@ import { FaCoins } from "react-icons/fa";
 import { IoIosListBox } from "react-icons/io";
 import { MdLock } from "react-icons/md";
 import { BiBullseye } from "react-icons/bi";
-import { useSidebar } from "../ui/sidebar";
+import { useSidebar } from "../../ui/sidebar";
 export function Cards() {
-
   const { setOpen } = useSidebar();
   return (
     <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4  *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs  @xl/main:grid-cols-2 @5xl/main:grid-cols-4'>
@@ -29,8 +28,7 @@ export function Cards() {
         </CardHeader>
         <CardFooter className='flex-col items-start gap-1.5 text-sm'>
           <div className='line-clamp-1 flex gap-2 font-medium'>
-
-              For tasks, and transfers
+            For tasks, and transfers
           </div>
         </CardFooter>
       </Card>
@@ -47,7 +45,7 @@ export function Cards() {
         </CardHeader>
         <CardFooter className='flex-col items-start gap-1.5 text-sm'>
           <div className='line-clamp-1 flex gap-2 font-medium'>
-        No active tasks
+            No active tasks
           </div>
         </CardFooter>
       </Card>

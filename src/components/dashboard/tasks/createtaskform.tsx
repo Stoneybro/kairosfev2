@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Input } from "../ui/input";
-import { PenaltyType } from "@/lib/types";
+import { Input } from "@/components/ui/input";
+import { PenaltyType } from "@/types";
 import { ChevronDownIcon } from "lucide-react";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Button } from "../ui/button";
-import DatePicker from "./datepicker";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
+import DatePicker from "@/components/dashboard/tasks/datePicker";
 export default function CreateTaskForm() {
   const [taskDescription, setTaskDescription] = useState("");
   const [rewardAmount, setRewardAmount] = useState("");
@@ -36,7 +36,7 @@ export default function CreateTaskForm() {
             onChange={(e) => setTaskDescription(e.target.value)}
             placeholder='Make a new task'
             required
-            className="text-sm"
+            className='text-sm'
           />
         </div>
 
@@ -154,7 +154,7 @@ export default function CreateTaskForm() {
                     type='number'
                     value={delayHours}
                     placeholder='hours'
-                    onChange={()=>{}}
+                    onChange={() => {}}
                     min='0'
                     max='23'
                     className='w-full text-sm'

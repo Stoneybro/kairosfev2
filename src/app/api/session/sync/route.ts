@@ -2,7 +2,10 @@
 import { NextResponse } from "next/server";
 import { privyVerify, privyClint } from "@/lib/auth/privy-server"; // fixed typo
 import { readContract } from "@/hooks/web3/server";
-import { CONTRACT_ADDRESSES, ACCOUNT_FACTORY_ABI } from "@/lib/contracts";
+import {
+  CONTRACT_ADDRESSES,
+  ACCOUNT_FACTORY_ABI,
+} from "@/lib/contracts/contracts";
 
 export async function POST(req: Request) {
   // verify session
@@ -12,7 +15,7 @@ export async function POST(req: Request) {
   }
 
   // safe JSON parsing
-  let body:any;
+  let body: any;
   try {
     body = await req.json();
   } catch {
@@ -59,7 +62,8 @@ export async function POST(req: Request) {
       : "0x0000000000000000000000000000000000000000";
 
   const isActivated =
-    smartAccountAddress !== "0x0000000000000000000000000000000000000000" || undefined;
+    smartAccountAddress !== "0x0000000000000000000000000000000000000000" ||
+    undefined;
 
   const res = NextResponse.json({
     ok: true,

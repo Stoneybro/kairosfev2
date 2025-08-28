@@ -1,24 +1,24 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import {useActivateWallet} from "@/hooks/useActivateWallet";
+import { useActivateWallet } from "@/hooks/useActivateWallet";
 import { Label } from "@radix-ui/react-label";
 import { Checkbox } from "@/components/ui/checkbox";
-import LoadingButton from "@/components/LoadingButton";
-import SvgLoading from "@/components/svg-loading";
+import LoadingButton from "@/components/ui/loaderButton";
+import SvgLoading from "@/components/ui/svg-loading";
 import { usePrivy } from "@privy-io/react-auth";
 function page() {
   const [checked, setChecked] = useState(false);
   const handleActivateWallet = useActivateWallet();
-  const {ready,authenticated,user}=usePrivy();
+  const { ready, authenticated, user } = usePrivy();
   if (!ready || !authenticated || !user) {
     return (
-  <div className='w-full h-screen flex justify-center items-center'>
-      <div className='w-32 h-32'>
-        <SvgLoading />
+      <div className='w-full h-screen flex justify-center items-center'>
+        <div className='w-32 h-32'>
+          <SvgLoading />
+        </div>
       </div>
-    </div>
-    )
+    );
   }
   return (
     <div>
@@ -48,7 +48,7 @@ function page() {
           </div>
           <Label className='hover:bg-muted/50 dark:hover:bg-muted/30 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-black has-[[aria-checked=true]]:bg-muted dark:has-[[aria-checked=true]]:border-accent dark:has-[[aria-checked=true]]:bg-muted/50'>
             <Checkbox
-            checked={checked}
+              checked={checked}
               onCheckedChange={() => {
                 setChecked(!checked);
               }}
@@ -66,16 +66,15 @@ function page() {
             </div>
           </Label>
           <LoadingButton
-          executeAction={async () => {
-            
-            const result = await handleActivateWallet();
-            return result ?? false;
-          }}
-          idleText="activate wallet"
-          loadingText="activating wallet"
-          successText="wallet activated"
-          className='w-full'
-          disabled={!checked}
+            executeAction={async () => {
+              const result = await handleActivateWallet();
+              return result ?? false;
+            }}
+            idleText='activate wallet'
+            loadingText='activating wallet'
+            successText='wallet activated'
+            className='w-full'
+            disabled={!checked}
           />
         </div>
       </div>
@@ -84,4 +83,3 @@ function page() {
 }
 
 export default page;
-

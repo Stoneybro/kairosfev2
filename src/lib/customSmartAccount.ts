@@ -5,16 +5,16 @@ import {
   SMART_ACCOUNT_ABI,
   ACCOUNT_FACTORY_ABI,
   ENTRYPOINT_ABI,
-} from "./contracts";
+} from "./contracts/contracts";
 import {
   useWallets,
   useSignMessage,
   useSignTypedData,
 } from "@privy-io/react-auth";
-import { CONTRACT_ADDRESSES } from "./contracts";
+import { CONTRACT_ADDRESSES } from "./contracts/contracts";
 import { publicClient } from "./pimlico";
 import { SmartAccount } from "viem/account-abstraction";
-import { normalizeSignature } from "./helpers";
+import { normalizeSignature } from "../utils/helpers";
 
 export type CustomSmartAccount = SmartAccount;
 
@@ -172,7 +172,6 @@ export default function useCustomSmartAccount() {
           const { signature } = await privySignMessage({
             message: userOpHash as `0x${string}`,
           });
-
 
           console.log("User Op HASH:", userOpHash);
           return signature as `0x${string}`;

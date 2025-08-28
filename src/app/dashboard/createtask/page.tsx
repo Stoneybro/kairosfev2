@@ -1,5 +1,5 @@
 import React from 'react'
-import CreateTaskForm from '@/components/dashboardComponents/createtaskform'
+import CreateTaskForm from '@/components/dashboard/tasks/createtaskform'
 function page() {
   return (
     <div>

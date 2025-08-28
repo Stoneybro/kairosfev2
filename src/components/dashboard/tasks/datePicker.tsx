@@ -1,10 +1,10 @@
 "use client"
 import React from "react";
-import { Button } from "../ui/button";
-import { Popover,PopoverTrigger,PopoverContent } from "../ui/popover";
-import {Calendar} from "../ui/calendar";
+import { Button } from "../../ui/button";
+import { Popover,PopoverTrigger,PopoverContent } from "../../ui/popover";
+import {Calendar} from "../../ui/calendar";
 import { ChevronDownIcon } from "lucide-react";
-import { Input } from "../ui/input";
+import { Input } from "../../ui/input";
 export default function DatePicker() {
   const [isDateOpen, setIsDateOpen] = React.useState(false);
   const [deadline, setDeadline] = React.useState<Date | undefined>(undefined);
