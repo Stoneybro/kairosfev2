@@ -1,18 +1,8 @@
 "use client";
 import { useSmartAccount } from "@/lib/useSmartAccount";
 import { toast } from "sonner";
-import { usePrivy, useSignMessage, useWallets } from "@privy-io/react-auth";
-import { publicClient } from "@/lib/pimlico";
-import { ENTRYPOINT_ABI, SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
-import {
-  encodeFunctionData,
-  hashMessage,
-  recoverAddress,
-  recoverMessageAddress,
-  hexToBytes,
-  keccak256,
-} from "viem";
-import { normalizeAndCanonicalizeSignature } from "@/utils/helpers";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
+
 
 export function useActivateWallet() {
   const { initClient } = useSmartAccount();

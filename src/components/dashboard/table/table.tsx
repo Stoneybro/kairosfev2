@@ -7,6 +7,7 @@ import TableNav from "./nav";
 import Createtaskbutton from "../tasks/create-task-button";
 import { TaskTableData, TaskType } from "@/types";
 import { formatEther } from "viem";
+import { formatDate } from "@/utils/helpers";
 type dataType = {
   rawData: TaskType[];
 };
@@ -16,13 +17,7 @@ function table({ rawData }: dataType) {
     id: task.id,
     title: task.description,
     rewardAmount: `${formatEther(task.rewardAmount)} ETH`,
-    deadline: new Date(Number(task.deadline) * 1000).toLocaleString("en-US", {
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    }),
+    deadline: formatDate(task.deadline),
     status: task.status,
     choice: task.choice,
   }));

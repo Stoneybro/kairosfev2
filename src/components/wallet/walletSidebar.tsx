@@ -11,19 +11,24 @@ import WalletActivity from "./walletActivity";
 import WalletSettings from "./walletSettings";
 import WalletDeposit from "./walletDeposit";
 
+type WalletSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  smartAccount: `0x${string}`; 
+};
+
 export function WalletSidebar({
+  smartAccount,
   ...props
-}: React.ComponentProps<typeof Sidebar>) {
+}: WalletSidebarProps) {
   const [activeTab, setActiveTab] = useState<activeTabType>("home");
   return (
     <Sidebar collapsible='offcanvas' {...props}>
       <div className='bg-background mx-auto my-auto h-[95vh] w-[95%] max-w-3xl rounded-xl  shadow'>
         <div className='w-full h-[10%]  '>
-          <WalletHeader setActiveTab={setActiveTab} />
+          <WalletHeader setActiveTab={setActiveTab} smartAccount={smartAccount} />
         </div>
         <div className='w-full h-[80%] flex flex-col relative'>
           <div className='w-full h-full flex justify-center items-center'>
-            {activeTab === "home" && <WalletHome setActiveTab={setActiveTab} />}
+            {activeTab === "home" && <WalletHome setActiveTab={setActiveTab} smartAccount={smartAccount} />}
             {activeTab === "receive" && <WalletRecieve />}
             {activeTab === "send" && <WalletSend />}
             {activeTab === "activity" && <WalletActivity />}

@@ -11,43 +11,16 @@ import { FaCoins } from "react-icons/fa";
 import { IoIosListBox } from "react-icons/io";
 import { MdLock } from "react-icons/md";
 import { BiBullseye } from "react-icons/bi";
-import { useQuery } from "@tanstack/react-query";
-import { getBalance, readContract } from "@/hooks/web3/server";
-import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
-import { formatEther } from "viem";
-import { CardsSkeleton } from "./cardsSkeleton";
-import { fetchTasks } from "@/utils/helpers";
-import { TaskType } from "@/types";
-import { formatNumber } from "@/utils/helpers";
-import { fetchDashboardBalance } from "@/utils/helpers";
+import { Skeleton } from "@/components/ui/skeleton";
+export function CardsSkeleton() {
 
-
-export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
-  const { data:cardData, isLoading:cardDataIsLoading } = useQuery({
-    queryKey: ["dashboardBalance", smartAccount],
-    queryFn: () => fetchDashboardBalance(smartAccount),
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    staleTime: Infinity,
-  });
-    const { data:tasksData  } = useQuery<TaskType[]>({
-    queryKey: ["tasks",smartAccount],
-    queryFn: () => fetchTasks(smartAccount),
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    staleTime: Infinity,
-  });
-
-  if (cardDataIsLoading) {
-    return <CardsSkeleton />;
-  }
   return (
     <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4  *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs  @xl/main:grid-cols-2 @5xl/main:grid-cols-4'>
       <Card className='@container/card'>
         <CardHeader>
           <CardDescription>Available Balance</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-            {`${cardData?.availableBalance} ETH`}
+            <Skeleton  className="w-20 h-5"  />
           </CardTitle>
           <CardAction>
             <FaCoins size={35} />
@@ -64,7 +37,7 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
         <CardHeader>
           <CardDescription>Active Tasks</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-            {`${tasksData?.length}`}
+            <Skeleton  className="w-20 h-5"  />
           </CardTitle>
           <CardAction>
             <IoIosListBox size={35} />
@@ -80,7 +53,7 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
         <CardHeader>
           <CardDescription>Commited Funds</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-            {`${cardData?.commitedFunds} ETH`}
+            <Skeleton  className="w-20 h-5"  />
           </CardTitle>
           <CardAction>
             <MdLock size={35} />
@@ -96,7 +69,7 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
         <CardHeader>
           <CardDescription>Task Performance</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-            44.4%
+            <Skeleton  className="w-20 h-5"  />
           </CardTitle>
           <CardAction>
             <BiBullseye size={35} />

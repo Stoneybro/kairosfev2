@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from "react";
+import { useState } from "react";
 import { toSmartAccount } from "viem/account-abstraction";
 import { encodeFunctionData, hashMessage, toHex } from "viem";
 import {
@@ -14,7 +14,7 @@ import {
 import { CONTRACT_ADDRESSES } from "./contracts/contracts";
 import { publicClient } from "./pimlico";
 import { SmartAccount } from "viem/account-abstraction";
-import { normalizeSignature } from "../utils/helpers";
+
 
 export type CustomSmartAccount = SmartAccount;
 

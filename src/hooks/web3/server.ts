@@ -23,7 +23,7 @@ export async function readContract<T = unknown>(params: {
 /**
  * Get an address balance. Safe on server.
  */
-export async function getBalanceServer(params: { address: `0x${string}` }) {
+export async function getBalance(params: { address: `0x${string}` }) {
   return publicClient.getBalance({ address: params.address });
 }
 

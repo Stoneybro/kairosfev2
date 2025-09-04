@@ -1,9 +1,11 @@
 import React from 'react'
 import CreateTaskForm from '@/components/dashboard/tasks/createtaskform'
-function page() {
+import { getSmartAccountAddress } from '../page';
+async function page() {
+    const smartAccount = await getSmartAccountAddress();
   return (
     <div>
-        <CreateTaskForm />
+        <CreateTaskForm smartAccount={smartAccount} />
       
     </div>
   )

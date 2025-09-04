@@ -4,15 +4,28 @@ import { CiMoneyCheck1 } from "react-icons/ci";
 import React from "react";
 import { Button } from "../ui/button";
 import { activeTabType } from "@/types";
+import { useQuery } from "@tanstack/react-query";
+import { fetchDashboardBalance } from "@/utils/helpers";
+import WalletSkeleton from "./walletSkeleton";
+import { Skeleton } from "../ui/skeleton";
 type WalletHomeProps = {
   setActiveTab: (tab: activeTabType) => void;
+    smartAccount: `0x${string}`; 
 };
-export default function WalletHome({ setActiveTab }: WalletHomeProps) {
+export default function WalletHome({ setActiveTab,smartAccount }: WalletHomeProps) {
+    const { data:walletData, isLoading:walletDataIsLoading } = useQuery({
+      queryKey: ["dashboardBalance", smartAccount],
+      queryFn: () => fetchDashboardBalance(smartAccount),
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      staleTime: Infinity,
+    });
+
   return (
     <div className='flex-1 flex flex-col items-center justify-center px-6'>
       <div className='text-center mb-8'>
-        <div className='text-4xl font-light mb-2'>
-          <span className=''>0.1</span>
+        <div className='text-4xl font-light mb-2 flex items-end'>
+          <span className=''>{walletDataIsLoading?<Skeleton className="h-12 w-16" />:`${walletData?.availableBalance}`}</span>
           <span className=' text-muted-foreground text-lg ml-1'>ETH</span>
         </div>
         <div className='text-sm  text-muted-foreground'>Available Balance</div>
@@ -22,11 +35,11 @@ export default function WalletHome({ setActiveTab }: WalletHomeProps) {
       <div className='w-full max-w-sm mb-8 space-y-3'>
         <div className='bg-muted/50 rounded-lg p-3 flex justify-between items-center'>
           <span className=' text-muted-foreground text-sm'>Total Balance</span>
-          <span className=' text-sm'>0.01ETH</span>
+          <span className=' text-sm'>{walletDataIsLoading?<Skeleton className="h-8 w-16" />:`${walletData?.totalBalance} ETH`}</span>
         </div>
         <div className='bg-muted/50 rounded-lg p-3 flex justify-between items-center'>
           <span className=' text-muted-foreground text-sm'>Committed</span>
-          <span className='  text-sm'>0.01ETH</span>
+          <span className='  text-sm'>{walletDataIsLoading?<Skeleton className="h-8 w-16" />:`${walletData?.commitedFunds} ETH`}</span>
         </div>
       </div>
 

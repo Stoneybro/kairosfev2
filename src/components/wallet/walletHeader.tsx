@@ -12,11 +12,29 @@ import { X } from "lucide-react";
 import CopyText from "../ui/copy";
 import { useSidebar } from "../ui/sidebar";
 import { activeTabType } from "@/types";
+import { usePrivy } from "@privy-io/react-auth";
+import { getBalance } from "@/hooks/web3/server";
+import { useQuery } from "@tanstack/react-query";
+import { formatNumber, truncateAddress } from "@/utils/helpers";
+import { Skeleton } from "../ui/skeleton";
+import { fetchUserBalance } from "@/utils/helpers";
 type WalletHeaderProps = {
   setActiveTab: (tab: activeTabType) => void;
+  smartAccount: `0x${string}`;
 };
-
-export default function WalletHeader({ setActiveTab }: WalletHeaderProps) {
+export default function WalletHeader({
+  setActiveTab,
+  smartAccount,
+}: WalletHeaderProps) {
+  const { user } = usePrivy();
+  const userAddress = user?.wallet?.address;
+  const { data: balance, isLoading: balanceIsLoading } = useQuery({
+    queryKey: ["userBalance", smartAccount],
+    queryFn: () => fetchUserBalance(smartAccount, userAddress as `0x${string}`),
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity,
+  });
   const [isOpen, setIsOpen] = useState(false);
   const { setOpenMobile, setOpen } = useSidebar();
   return (
@@ -39,7 +57,7 @@ export default function WalletHeader({ setActiveTab }: WalletHeaderProps) {
             className='w-[90%]   rounded-2xl bg-card '
           >
             <Button variant='outline' className=' tracking-wide relative '>
-              0x1Edeb...B5b7d7
+              {truncateAddress(smartAccount)}
               <HiOutlineChevronDown
                 size={10}
                 className={`absolute right-2 top-2.5 ml-2 transition-transform duration-200 ${
@@ -55,10 +73,17 @@ export default function WalletHeader({ setActiveTab }: WalletHeaderProps) {
               </div>
               <div className='flex justify-between '>
                 <div className='flex gap-3  items-center '>
-                  0x1Edeb...B5b7d7
-                  <CopyText text={"0x1Edeb...B5b7d7"} />
+                  {truncateAddress(userAddress!)}
+                  <CopyText text={userAddress!} />
                 </div>
-                <div className=''>1 ETH</div>
+                <div className=''>
+                  {balanceIsLoading ? (
+                    <Skeleton className='w-16 h-4' />
+                  ) : (
+                    balance?.userAddressBalance
+                  )}{" "}
+                  ETH
+                </div>
               </div>
             </div>
 
@@ -66,10 +91,17 @@ export default function WalletHeader({ setActiveTab }: WalletHeaderProps) {
               <div className='text-muted-foreground text-sm'>Smart Wallet</div>
               <div className='flex justify-between'>
                 <div className='flex gap-3 items-center'>
-                  0x1Edeb...B5b7d7
-                  <CopyText text={"0x1Edeb...B5b7d7"} />
+                  {truncateAddress(smartAccount)}
+                  <CopyText text={smartAccount} />
                 </div>
-                <div className=''>0.01 ETH</div>
+                <div className=''>
+                  {balanceIsLoading ? (
+                    <Skeleton className='w-16 h-4' />
+                  ) : (
+                    balance?.smartAccountbalance
+                  )}{" "}
+                  ETH
+                </div>
               </div>
             </div>
             <div className=''></div>

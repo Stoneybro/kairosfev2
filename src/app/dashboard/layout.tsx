@@ -1,32 +1,16 @@
-"use client";
+
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { WalletSidebar } from "@/components/wallet/walletSidebar";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { usePrivy } from "@privy-io/react-auth";
-import { useRouter } from "next/navigation";
-import SvgLoading from "@/components/ui/svg-loading";
-import { useEffect } from "react";
-export default function Dashboard({
+import { getSmartAccountAddress } from "./page";
+
+export default async function Dashboard({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { ready, authenticated } = usePrivy();
-  const router = useRouter();
-  useEffect(() => {
-    if (!ready) return;
-    if (!authenticated) router.push("/login");
-  }, [ready, authenticated, router]);
-  if (!ready) {
-    return (
-      <div className='w-full h-[100vh] flex justify-center items-center'>
-        <div className=' h-[20vh] w-[20vw]'>
-          <SvgLoading />
-        </div>
-      </div>
-    );
-  }
-  if (!authenticated) return null;
+
+const smartAccount= await getSmartAccountAddress()
   return (
     <SidebarProvider
       style={
@@ -46,7 +30,7 @@ export default function Dashboard({
           </div>
         </div>
       </SidebarInset>
-      <WalletSidebar variant='inset' side='right' />
+      <WalletSidebar variant='inset' side='right' smartAccount={smartAccount}  />
     </SidebarProvider>
   );
 }
