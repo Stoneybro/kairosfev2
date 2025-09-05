@@ -15,7 +15,6 @@ import { CONTRACT_ADDRESSES } from "./contracts/contracts";
 import { publicClient } from "./pimlico";
 import { SmartAccount } from "viem/account-abstraction";
 
-
 export type CustomSmartAccount = SmartAccount;
 
 export default function useCustomSmartAccount() {
@@ -31,7 +30,6 @@ export default function useCustomSmartAccount() {
   // ----------------- CONFIG -----------------
   const ENTRY_POINT_ADDR = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"; // v0.6
   const ENTRY_POINT_VERSION = "0.6";
-  const USER_NONCE = 0n; //  each address is allowed only one deployment
 
   // Compute deterministic address via factory helper
   async function predictAddress(ownerAddress: `0x${string}`) {
@@ -39,7 +37,7 @@ export default function useCustomSmartAccount() {
       address: CONTRACT_ADDRESSES.ACCOUNT_FACTORY,
       abi: ACCOUNT_FACTORY_ABI,
       functionName: "getAddressForUser",
-      args: [ownerAddress, USER_NONCE],
+      args: [ownerAddress],
     }) as Promise<`0x${string}`>;
   }
 
@@ -61,7 +59,6 @@ export default function useCustomSmartAccount() {
       return customSmartAccount;
     }
     setIsLoading(true);
-    const provider = await owner?.getEthereumProvider();
     try {
       const account = await toSmartAccount({
         client: publicClient,
@@ -100,7 +97,7 @@ export default function useCustomSmartAccount() {
             factoryData: encodeFunctionData({
               abi: ACCOUNT_FACTORY_ABI,
               functionName: "createAccount",
-              args: [USER_NONCE],
+              args: [owner.address as `0x${string}`], // key = 0
             }),
           };
         },
@@ -145,7 +142,25 @@ export default function useCustomSmartAccount() {
           return signature as `0x${string}`;
         },
         async signUserOperation(userOperation) {
-          console.log("Signing user operation:", userOperation);
+          // ensure sane gas defaults
+          if (
+            !userOperation.verificationGasLimit ||
+            userOperation.verificationGasLimit === 0n
+          ) {
+            userOperation.verificationGasLimit = 2_000_000n;
+          }
+          if (
+            !userOperation.callGasLimit ||
+            userOperation.callGasLimit === 0n
+          ) {
+            userOperation.callGasLimit = 500_000n;
+          }
+          if (
+            !userOperation.preVerificationGas ||
+            userOperation.preVerificationGas === 0n
+          ) {
+            userOperation.preVerificationGas = 20_000n;
+          }
 
           const uoForHash = {
             sender: userOperation.sender as `0x${string}`,
@@ -168,12 +183,30 @@ export default function useCustomSmartAccount() {
             args: [uoForHash],
           });
 
-          console.log("User operation hash:", userOpHash);
-          const { signature } = await privySignMessage({
-            message: userOpHash as `0x${string}`,
+          // EIP-712 domain MUST match the contract's domain calculation.
+          const chainId = Number(await publicClient.getChainId());
+          const domain = {
+            name: "EntryPoint", // must match contract
+            version: "0.6", // must match contract
+            chainId,
+            verifyingContract: ENTRY_POINT_ADDR,
+          };
+
+          const types = {
+            UserOperation: [{ name: "userOpHash", type: "bytes32" }],
+          };
+
+          // message is the userOpHash received from EntryPoint.getUserOpHash
+          const message = { userOpHash };
+
+          // Privy: signTypedData with those exact domain/types/message
+          const { signature } = await privySignTypedData({
+            domain,
+            types,
+            primaryType: "UserOperation",
+            message,
           });
 
-          console.log("User Op HASH:", userOpHash);
           return signature as `0x${string}`;
         },
       });

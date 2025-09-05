@@ -5,7 +5,7 @@ import { verifyAuth } from "./lib/auth/middlewareAuth";
 export async function middleware(request: NextRequest) {
   const { isAuthenticated, isActivated, grace } = await verifyAuth(request);
   const isLoginPage = request.nextUrl.pathname.startsWith("/login");
-  const isActivatePage = request.nextUrl.pathname.startsWith("/activateWallet");
+  const isActivatePage = request.nextUrl.pathname.startsWith("/activatewallet");
   if (!isAuthenticated) {
     if (grace && request.method === "GET") {
       const res = NextResponse.next();
@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isAuthenticated && !isActivated && !isActivatePage) {
-    return NextResponse.redirect(new URL("/activateWallet", request.url));
+    return NextResponse.redirect(new URL("/activatewallet", request.url));
   }
   if (isAuthenticated && isActivated && (isLoginPage || isActivatePage)) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
@@ -26,5 +26,5 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 export const config = {
-  matcher: ["/dashboard/:path*", "/dashboard", "/activateWallet", "/login"],
+  matcher: ["/dashboard/:path*", "/dashboard", "/activatewallet", "/login"],
 };

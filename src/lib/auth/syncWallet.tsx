@@ -103,7 +103,7 @@ export default function SyncWalletAfterLogin() {
 
       const data = query.data as any;
       if (data?.activated) router.push("/dashboard");
-      else if (data?.ok && !data?.activated) router.push("/activateWallet");
+      else if (data?.ok && !data?.activated) router.push("/activatewallet");
       else router.replace("/login");
     })();
   }, [query.isFetched, query.isError, query.data, router]);
