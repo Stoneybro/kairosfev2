@@ -2,9 +2,7 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import Table from "./table";
-import { readContract } from "@/hooks/web3/server";
-import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
-import { toSerializable } from "@/utils/helpers";
+
 import { TableSkeleton } from "./tableSkeleton";
 import { fetchTasks } from "@/utils/helpers";
 
@@ -22,8 +20,8 @@ export function TaskTableWrapper({
   });
 
   if (isLoading) return <div><TableSkeleton /></div>;
-  if (error) return <div>Error loading tasks</div>;
-  if (!data) return <div>No tasks found</div>;
+  if (error) return <div><TableSkeleton error={true} /></div>;
+  if (!data) return <div><TableSkeleton error={true} /></div>;
 
    return <Table rawData={data} />;
 

@@ -1,7 +1,6 @@
 "use client";
 import { useSmartAccount } from "@/lib/useSmartAccount";
 import { toast } from "sonner";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { encodeFunctionData } from "viem";
 import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
@@ -11,6 +10,7 @@ type CreateTaskArgsType = {
   rewardAmount: bigint;
   deadlineInSeconds: bigint;
   penaltyChoice: number;
+  verificationMethod: number;
   sendBuddy?: `0x${string}`;
   delayPayment?: bigint;
 };
@@ -31,8 +31,9 @@ export function useCreateTask(smartAccount: `0x${string}`) {
           payLoad.rewardAmount,
           payLoad.deadlineInSeconds,
           payLoad.penaltyChoice,
-          payLoad.sendBuddy ?? "0x0000000000000000000000000000000000000000",
           payLoad.delayPayment ?? 0n,
+          payLoad.sendBuddy ?? "0x0000000000000000000000000000000000000000",
+          payLoad.verificationMethod,
         ],
       });
 

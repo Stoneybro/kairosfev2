@@ -4,7 +4,6 @@ import { getSmartAccountClient } from "./smartAccountClient";
 import { SmartAccountClient } from "permissionless";
 import { useWallets } from "@privy-io/react-auth";
 import useCustomSmartAccount from "./customSmartAccount";
-import { init } from "next/dist/compiled/webpack/webpack";
 
 export function useSmartAccount() {
   const [smartAccountClient, setSmartAccountClient] =
@@ -27,7 +26,6 @@ export function useSmartAccount() {
       throw new Error("Error initializing Smart Account Client");
     }
     if (smartAccountClient) {
-      console.log("Smart Account Client already initialized", smartAccountClient.account?.address);
       return smartAccountClient; // Already initialized
     }
     if (isClientReady) {

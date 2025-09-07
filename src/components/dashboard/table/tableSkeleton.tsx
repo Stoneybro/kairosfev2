@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function TableSkeleton() {
+export function TableSkeleton({error}:{error?:boolean}) {
   return (
     <div className="overflow-x-auto flex flex-col gap-8">
       <div className="flex justify-between">
@@ -18,6 +18,8 @@ export function TableSkeleton() {
               <th className="p-2 text-left font-semibold">Deadline</th>
             </tr>
           </thead>
+
+          {error?<tbody><div className="flex justify-center items-center text-xl"> Error retrieving Tasks</div></tbody>:
           <tbody>
             {Array.from({ length: 7 }).map((_, rowIdx) => (
               <tr key={rowIdx} className="border-t">
@@ -35,7 +37,7 @@ export function TableSkeleton() {
                 </td>
               </tr>
             ))}
-          </tbody>
+          </tbody>}
         </table>
       </div>
     </div>

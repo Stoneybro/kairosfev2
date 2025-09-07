@@ -26,7 +26,9 @@ function createSchema(availableBalance?: string) {
         .regex(/^\d+(\.\d+)?$/, "Enter a valid number")
         .refine((v) => Number(v) > 0, "Reward must be > 0"),
       deadline: z.instanceof(Date).nullable(),
-
+      verificationMethod: z.number().refine((v) => /^[0-2]$/.test(String(v)), {
+        message: "Verification method must be Manual,Partner or AI",
+      }),
       penaltyType: z.nativeEnum(PenaltyType),
       delayDays: z
         .string()
@@ -140,15 +142,14 @@ function createSchema(availableBalance?: string) {
 type FormValues = z.infer<ReturnType<typeof createSchema>>;
 
 export default function CreateTaskForm({
-  onSubmit,
   smartAccount,
 }: {
-  onSubmit?: (payload: any) => Promise<any> | void;
   smartAccount?: `0x${string}`;
 }) {
   const { data: cardData, isLoading: cardDataIsLoading } = useQuery({
     queryKey: ["dashboardBalance", smartAccount],
     queryFn: () => fetchDashboardBalance(smartAccount as `0x${string}`),
+    enabled: Boolean(smartAccount),
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     staleTime: Infinity,
@@ -173,6 +174,7 @@ export default function CreateTaskForm({
       description: "",
       rewardEth: "",
       deadline: null,
+      verificationMethod: 0,
       penaltyType: PenaltyType.DELAY_PAYMENT,
       delayDays: "",
       delayHours: "",
@@ -197,14 +199,16 @@ export default function CreateTaskForm({
         ? BigInt(Math.floor(values.deadline.getTime() / 1000))
         : BigInt(defaultDeadline),
       penaltyChoice: values.penaltyType === PenaltyType.DELAY_PAYMENT ? 1 : 2,
+      verificationMethod: values.verificationMethod,
+      delayPayment: BigInt(delaySeconds),
       sendBuddy:
-        values.buddyAddress as `0x${string}` || "0x0000000000000000000000000000000000000000",
-      delayPayment:BigInt(delaySeconds),
+        (values.buddyAddress as `0x${string}`) ||
+        "0x0000000000000000000000000000000000000000",
     };
 
     try {
-      console.log(payload)
-      createTask.mutate(payload);
+      console.log(payload);
+      //createTask.mutate(payload);
     } catch (err) {
       console.error("create task failed", err);
       throw err;
@@ -256,7 +260,7 @@ export default function CreateTaskForm({
               <Skeleton className='h-2 w-4' />
             ) : (
               cardData?.availableBalance
-            )}{" "}
+            )}
             ETH
           </div>
           {errors.rewardEth && (
@@ -284,6 +288,40 @@ export default function CreateTaskForm({
             </div>
           )}
         </div>
+        {/* Verification Method */}
+        <Controller
+          control={control}
+          name='verificationMethod'
+          render={({ field: { value, onChange } }) => (
+            <div className=''>
+              <RadioGroup
+                value={String(value)}
+                onValueChange={(vm) => onChange(vm)}
+              >
+                <div className='text-muted-foreground text-sm'>
+                  Verification Method
+                </div>
+                <div className='flex items-center gap-1 text-muted-foreground text-sm'>
+                  <label htmlFor='r1'>
+                    <RadioGroupItem value='0' id='r1' /> Manual
+                  </label>
+                </div>
+                <div className='flex items-center gap-1 text-muted-foreground/50 text-sm'>
+                  <label htmlFor='r2'>
+                    <RadioGroupItem value='1' id='r2' disabled />
+                    Accountability partner
+                  </label>
+                </div>
+                <div className='flex items-center gap-1 text-muted-foreground/50 text-sm'>
+                  <label htmlFor='r3'>
+                    <RadioGroupItem value='2' id='r3' disabled /> A.I.
+                    Verification
+                  </label>
+                </div>
+              </RadioGroup>
+            </div>
+          )}
+        />
 
         {/* Penalty */}
         <div className='max-w-md'>

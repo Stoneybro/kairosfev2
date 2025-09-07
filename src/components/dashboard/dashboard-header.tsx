@@ -35,7 +35,7 @@ export function DashboardHeader() {
             className='ml-2 data-[orientation=vertical]:h-4 '
           />
 
-          <Button variant='ghost' onClick={()=>setOpen(!open)}>
+          <Button variant='ghost' onClick={() => { setOpen(!open); setOpenMobile(!openMobile); }} className='px-2 lg:px-3'>
             <IoWalletOutline className='w-6! h-6!' />
           </Button>
         </div>

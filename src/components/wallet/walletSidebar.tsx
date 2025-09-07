@@ -10,25 +10,33 @@ import WalletSend from "./walletSend";
 import WalletActivity from "./walletActivity";
 import WalletSettings from "./walletSettings";
 import WalletDeposit from "./walletDeposit";
+import { Button } from "../ui/button";
+import WalletFaucet from "./walletFaucet";
 
 type WalletSidebarProps = React.ComponentProps<typeof Sidebar> & {
-  smartAccount: `0x${string}`; 
+  smartAccount: `0x${string}`;
 };
 
-export function WalletSidebar({
-  smartAccount,
-  ...props
-}: WalletSidebarProps) {
+export function WalletSidebar({ smartAccount, ...props }: WalletSidebarProps) {
   const [activeTab, setActiveTab] = useState<activeTabType>("home");
+
   return (
     <Sidebar collapsible='offcanvas' {...props}>
       <div className='bg-background mx-auto my-auto h-[95vh] w-[95%] max-w-3xl rounded-xl  shadow'>
         <div className='w-full h-[10%]  '>
-          <WalletHeader setActiveTab={setActiveTab} smartAccount={smartAccount} />
+          <WalletHeader
+            setActiveTab={setActiveTab}
+            smartAccount={smartAccount}
+          />
         </div>
         <div className='w-full h-[80%] flex flex-col relative'>
           <div className='w-full h-full flex justify-center items-center'>
-            {activeTab === "home" && <WalletHome setActiveTab={setActiveTab} smartAccount={smartAccount} />}
+            {activeTab === "home" && (
+              <WalletHome
+                setActiveTab={setActiveTab}
+                smartAccount={smartAccount}
+              />
+            )}
             {activeTab === "receive" && <WalletRecieve />}
             {activeTab === "send" && <WalletSend />}
             {activeTab === "activity" && <WalletActivity />}
@@ -36,7 +44,7 @@ export function WalletSidebar({
             {activeTab === "deposit" && <WalletDeposit />}
           </div>
           <div className='text-sm text-gray-400 self-center absolute bottom-10'>
-            Deposit to get started
+            <WalletFaucet smartAccount={smartAccount} />
           </div>
         </div>
 

@@ -13,7 +13,7 @@ type LoadingButtonProps = {
   timeoutMs?: number; // optional
 };
 
-export default function LoadingButton({
+export default function LoaderButton({
   executeAction,
   idleText,
   loadingText,
@@ -21,7 +21,7 @@ export default function LoadingButton({
   variant = "default",
   className,
   disabled,
-  timeoutMs = 15000,
+  timeoutMs = 30000,
 }: LoadingButtonProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
@@ -48,11 +48,11 @@ export default function LoadingButton({
       const result = await executeAction();
       if (result) {
         setStatus("success");
-        setTimeout(() => setStatus("idle"), 3000);
+        setTimeout(() => setStatus("idle"), 10000);
       } else {
         setStatus("idle");
       }
-    } catch {
+    } catch (err) {
       setStatus("idle");
     } finally {
       clearTimeout(timeoutId);

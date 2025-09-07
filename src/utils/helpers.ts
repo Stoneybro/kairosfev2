@@ -1,5 +1,5 @@
 import { getBalance, readContract } from "@/hooks/web3/server";
-import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
+import { CONTRACT_ADDRESSES, KAIROSFAUCET_ABI, SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
 import { formatEther } from "viem";
 
 export  function toSerializable(obj: any): any {
@@ -69,11 +69,30 @@ export async function fetchTasks(smartAccount: `0x${string}`) {
   const serializedResult = toSerializable(result);
   return serializedResult;
 }
-export async function fetchTasksCount(smartAccount: `0x${string}`) {
+export async function fetchTasksCount(smartAccount: `0x${string}`,status:number,start:number,limit:number) {
   const result = await readContract({
     address: smartAccount,
     abi: SMART_ACCOUNT_ABI,
     functionName: "getTasksCountByStatus",
+    args:[status,start,limit]
+  });
+  return toSerializable(result);
+}
+export async function getTasksByStatus(smartAccount: `0x${string}`) {
+    const result = await readContract({
+    address: smartAccount,
+    abi: SMART_ACCOUNT_ABI,
+    functionName: "getTasksByStatus",
+  });
+  return toSerializable(result);
+}
+
+export async function checkFaucetStatus(smartAccount: `0x${string}`) {
+  const result = await readContract({
+    address: CONTRACT_ADDRESSES.FAUCET,
+    abi: KAIROSFAUCET_ABI,
+    functionName: "checkClaimStatus",
+    args:[smartAccount]
   });
   return toSerializable(result);
 }
