@@ -8,6 +8,7 @@ import { toast } from "sonner";
 export default function useFaucetClaim() {
   const { initClient } = useSmartAccount();
 
+
   async function faucetClaim() {
     try {
       const smartAccountClient = await initClient();

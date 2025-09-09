@@ -80,11 +80,8 @@ export default function useCustomSmartAccount() {
           if (calls.length !== 1)
             throw new Error("minimal adapter supports 1 call");
           const [c] = calls;
-          return encodeFunctionData({
-            abi: SMART_ACCOUNT_ABI,
-            functionName: "execute",
-            args: [c.to as `0x${string}`, c.value ?? 0n, c.data ?? "0x"],
-          });
+            return c.data ?? "0x"; // <-- direct call
+          
         },
         async getAddress() {
           return predictAddress(

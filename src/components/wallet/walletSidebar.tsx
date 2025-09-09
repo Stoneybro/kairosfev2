@@ -10,7 +10,6 @@ import WalletSend from "./walletSend";
 import WalletActivity from "./walletActivity";
 import WalletSettings from "./walletSettings";
 import WalletDeposit from "./walletDeposit";
-import { Button } from "../ui/button";
 import WalletFaucet from "./walletFaucet";
 
 type WalletSidebarProps = React.ComponentProps<typeof Sidebar> & {

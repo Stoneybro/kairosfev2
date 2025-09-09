@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { privyVerify, privyClient } from "@/lib/auth/privy-server";
-import { readContract } from "@/hooks/web3/server";
+import { readContract } from "@/hooks/native/server";
 import {
   CONTRACT_ADDRESSES,
   ACCOUNT_FACTORY_ABI,

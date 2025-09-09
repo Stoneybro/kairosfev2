@@ -3,7 +3,6 @@
 import React, { useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,7 +12,9 @@ import { fetchDashboardBalance } from "@/utils/helpers";
 import { useQuery } from "@tanstack/react-query";
 import DatePicker from "@/components/dashboard/tasks/datePicker";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCreateTask } from "@/hooks/web3/useCreateTask";
+import { useCreateTask } from "@/hooks/useCreateTask";
+import { toast } from "sonner";
+import LoaderButton from "@/components/ui/loaderButton";
 function createSchema(availableBalance?: string) {
   return z
     .object({
@@ -166,7 +167,8 @@ export default function CreateTaskForm({
     handleSubmit,
     control,
     watch,
-    formState: { errors, isSubmitting },
+    reset,
+    formState: { errors, isSubmitting, isValid },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -208,15 +210,21 @@ export default function CreateTaskForm({
 
     try {
       console.log(payload);
-      //createTask.mutate(payload);
+      createTask.mutate(payload);
+      await createTask.mutateAsync(payload);
+      toast.success("Task Created Succesfully")
+      reset()
+      return true;
     } catch (err) {
       console.error("create task failed", err);
-      throw err;
+      console.log(err);
+      toast.error("Task Creation Failed");
+      return false;
     }
   }
 
   return (
-    <form onSubmit={handleSubmit(handleCreate)} className='max-w-xl'>
+    <form className='max-w-xl'>
       <div className='flex flex-col gap-4 w-full'>
         <div className='text-3xl'>Create Task</div>
 
@@ -432,9 +440,21 @@ export default function CreateTaskForm({
           )}
         </div>
 
-        <Button type='submit' className='w-full' disabled={isSubmitting}>
-          {isSubmitting ? "Creating..." : "Create Task"}
-        </Button>
+        <LoaderButton
+          className='w-full'
+          idleText='Create Task'
+          loadingText='Creating...'
+          successText='Task Created!'
+          disabled={!isValid || isSubmitting}
+          timeoutMs={60000}
+          executeAction={async () => {
+            let success = false;
+            await handleSubmit(async (values) => {
+              success = await handleCreate(values); // handleCreate must return boolean
+            })();
+            return success;
+          }}
+        />
       </div>
     </form>
   );

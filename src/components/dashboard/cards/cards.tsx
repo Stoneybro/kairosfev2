@@ -12,13 +12,8 @@ import { IoIosListBox } from "react-icons/io";
 import { MdLock } from "react-icons/md";
 import { BiBullseye } from "react-icons/bi";
 import { useQuery } from "@tanstack/react-query";
-import { getBalance, readContract } from "@/hooks/web3/server";
-import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
-import { formatEther } from "viem";
 import { CardsSkeleton } from "./cardsSkeleton";
-import { fetchTasks } from "@/utils/helpers";
-import { TaskType } from "@/types";
-import { formatNumber } from "@/utils/helpers";
+import { fetchTasksCount } from "@/utils/helpers";
 import { fetchDashboardBalance } from "@/utils/helpers";
 
 
@@ -30,15 +25,13 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
     refetchOnReconnect: false,
     staleTime: Infinity,
   });
-    const { data:tasksData  } = useQuery<TaskType[]>({
-    queryKey: ["tasks",smartAccount],
-    queryFn: () => fetchTasks(smartAccount),
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    staleTime: Infinity,
-  });
+  const{data:taskCount,isLoading:taskCountLoading,error}=useQuery({
+    queryKey:["taskCount",smartAccount],
+    queryFn:()=>fetchTasksCount(smartAccount),
+    staleTime:Infinity
+  })
 
-  if (cardDataIsLoading) {
+  if (cardDataIsLoading && taskCountLoading) {
     return <CardsSkeleton />;
   }
   return (
@@ -64,7 +57,7 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
         <CardHeader>
           <CardDescription>Active Tasks</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-            {`${tasksData?.length}`}
+            {taskCountLoading?"0":taskCount[0]}
           </CardTitle>
           <CardAction>
             <IoIosListBox size={35} />

@@ -13,7 +13,7 @@ import CopyText from "../ui/copy";
 import { useSidebar } from "../ui/sidebar";
 import { activeTabType } from "@/types";
 import { usePrivy } from "@privy-io/react-auth";
-import { getBalance } from "@/hooks/web3/server";
+import { getBalance } from "@/hooks/native/server";
 import { useQuery } from "@tanstack/react-query";
 import { formatNumber, truncateAddress } from "@/utils/helpers";
 import { Skeleton } from "../ui/skeleton";

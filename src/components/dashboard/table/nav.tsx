@@ -9,23 +9,28 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { fetchTasksCount } from "@/utils/helpers";
 type TableNavType = {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
+  activeTab: "Active tasks" | "Completed tasks" | "Canceled tasks" | "Expired tasks";
+  setActiveTab: (tab:  "Active tasks" | "Completed tasks" | "Canceled tasks" | "Expired tasks") => void;
+  smartAccount:`0x${string}`
 };
 
-export default function TableNav({activeTab,setActiveTab}: TableNavType) {
-
-
-  const activeTaskCount = 0;
-  const completedTaskCount = 0;
-  const canceledTaskCount = 0;
-  const expiredTaskCount = 0;
-
+export default function TableNav({activeTab,setActiveTab,smartAccount}: TableNavType) {
+const{data,isLoading,error}=useQuery({
+  queryKey:["taskCount",smartAccount],
+  queryFn:()=>fetchTasksCount(smartAccount),
+  staleTime:Infinity
+})
+  const activeTaskCount = isLoading?0:data[0]
+  const completedTaskCount =  isLoading?0:data[1]
+  const canceledTaskCount =  isLoading?0:data[2]
+  const expiredTaskCount = isLoading?0:data[3]
   return (
     <Tabs
       value={activeTab}
-      onValueChange={setActiveTab}
+      onValueChange={(value) => setActiveTab(value as TableNavType["activeTab"])}
       className='w-full flex flex-col gap-8 '
     >
       <div className='flex items-center justify-between  bg-muted/20'>

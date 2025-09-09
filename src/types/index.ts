@@ -48,3 +48,11 @@ export enum TaskStatus {
   CANCELED = 2,
   EXPIRED = 3,
 }
+const STATUS_MAP = {
+  "Active tasks": 0,
+  "Completed tasks": 1,
+  "Canceled tasks": 2,
+  "Expired tasks": 3,
+} as const;
+
+export type TabKey = keyof typeof STATUS_MAP;

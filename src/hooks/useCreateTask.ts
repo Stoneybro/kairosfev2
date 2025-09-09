@@ -1,6 +1,5 @@
 "use client";
 import { useSmartAccount } from "@/lib/useSmartAccount";
-import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { encodeFunctionData } from "viem";
 import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
@@ -52,11 +51,11 @@ export function useCreateTask(smartAccount: `0x${string}`) {
     },
     onSuccess: (data, payLoad) => {
       qc.invalidateQueries({ queryKey: ["tasks", smartAccount] });
-      toast.success("Task created");
-      console.log(data);
+      qc.invalidateQueries({ queryKey: ["dashboardBalance", smartAccount] });
+      qc.invalidateQueries({ queryKey: ["taskCount",smartAccount] });
+      
     },
     onError: (err, payLoad, context: any) => {
-      toast.error("Transaction failed");
       console.log(err);
     },
     onSettled: (_data, payLoad) => {
