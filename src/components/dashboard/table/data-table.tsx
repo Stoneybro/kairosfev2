@@ -44,6 +44,7 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     
   });
+  const statusSlug = activeTab.toLowerCase().replace(/\s+/g, "-");
   return (
     <>
       <div className={`w-full  border rounded`}>
@@ -77,19 +78,19 @@ export function DataTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className='cursor-pointer'
-                  onClick={()=>router.push(`/dashboard/${row.id.toString()}`)}
+                  onClick={()=>router.push(`/dashboard/${statusSlug.toLowerCase()}/${row.id.toString()}`)}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className='pl-4 py-4'>
                       <Link
-                        href={`/dashboard/${row.id.toString()}`}
+                        href={`/dashboard/${statusSlug.toLowerCase()}/${row.id.toString()}`}
                         className='block w-full h-full'
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
                         )}
-                      </Link>{" "}
+                      </Link>
                     </TableCell>
                   ))}
                 </TableRow>

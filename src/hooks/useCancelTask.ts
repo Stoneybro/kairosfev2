@@ -4,23 +4,21 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { encodeFunctionData } from "viem";
 import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
 
-type CancelTaskArgsType = {
-  taskId: bigint;
-};
+
 
 export function useCancelTask(smartAccount: `0x${string}`) {
   const { initClient } = useSmartAccount();
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payLoad: CancelTaskArgsType) => {
+    mutationFn: async (payLoad: bigint) => {
       const client = await initClient();
       if (!client) throw new Error("Smart account not initialized");
       const callData = encodeFunctionData({
         abi: SMART_ACCOUNT_ABI,
         functionName: "cancelTask",
         args: [
-          payLoad.taskId,
+          payLoad
         ],
       });
       const hash = await client.sendUserOperation({

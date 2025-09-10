@@ -38,6 +38,7 @@ export function formatDate(date: bigint) {
   });
 }
 
+
 export async function fetchDashboardBalance(
   smartAccountAddress: `0x${string}`
 ) {

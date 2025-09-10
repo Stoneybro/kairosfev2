@@ -105,9 +105,9 @@ export function TaskTableWrapper({
     return <TableSkeleton error />;
   }
 
-  // if (!activeQuery.data || activeQuery.data.length === 0) {
-  //   return <TableSkeleton noData />;
-  // }
+  if (!activeQuery.data || activeQuery.data.length === 0) {
+    return <TableSkeleton noData />;
+  }
 
   return (
     <div className='flex flex-col gap-8'>
