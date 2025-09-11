@@ -1,8 +1,8 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
-import { TaskTableData } from "@/types";
+import { TaskStatus, TaskTableData } from "@/types";
 import { Badge } from "../../ui/badge";
-import { statusMap } from "@/types";
+
 
 export const columns: ColumnDef<TaskTableData>[] = [
   {
@@ -18,10 +18,9 @@ export const columns: ColumnDef<TaskTableData>[] = [
     header: "Status",
     cell: ({ getValue }) => {
       const value = getValue<number>();
-      const status = statusMap[value] ?? { label: "unknown", color: "" };
       return (
         <Badge variant={"outline"} className='flex items-center'>
-          {status.label}
+          {TaskStatus[value]}
         </Badge>
       );
     },

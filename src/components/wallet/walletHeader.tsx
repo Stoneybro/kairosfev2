@@ -51,62 +51,10 @@ export default function WalletHeader({
         }
       </div>
       <div className='flex-6 flex justify-center '>
-        <DropdownMenu onOpenChange={setIsOpen}>
-          <DropdownMenuTrigger
-            asChild
-            className='w-[90%]   rounded-2xl bg-card '
-          >
-            <Button variant='outline' className=' tracking-wide relative '>
+            <div  className=' flex justify-center items-center gap-2 '>
               {truncateAddress(smartAccount)}
-              <HiOutlineChevronDown
-                size={10}
-                className={`absolute right-2 top-2.5 ml-2 transition-transform duration-200 ${
-                  isOpen ? "rotate-180" : ""
-                }`}
-              />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className='lg:w-72 p-2' align='center'>
-            <div className='flex flex-col gap-1 p-2'>
-              <div className='text-muted-foreground text-sm'>
-                Personal Wallet
-              </div>
-              <div className='flex justify-between '>
-                <div className='flex gap-3  items-center '>
-                  {truncateAddress(userAddress!)}
-                  <CopyText text={userAddress!} />
-                </div>
-                <div className=''>
-                  {balanceIsLoading ? (
-                    <Skeleton className='w-16 h-4' />
-                  ) : (
-                    balance?.userAddressBalance
-                  )}{" "}
-                  ETH
-                </div>
-              </div>
+              <CopyText text={smartAccount} />
             </div>
-
-            <div className='flex flex-col gap-1 p-2'>
-              <div className='text-muted-foreground text-sm'>Smart Wallet</div>
-              <div className='flex justify-between'>
-                <div className='flex gap-3 items-center'>
-                  {truncateAddress(smartAccount)}
-                  <CopyText text={smartAccount} />
-                </div>
-                <div className=''>
-                  {balanceIsLoading ? (
-                    <Skeleton className='w-16 h-4' />
-                  ) : (
-                    balance?.smartAccountbalance
-                  )}{" "}
-                  ETH
-                </div>
-              </div>
-            </div>
-            <div className=''></div>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
       <div className='flex-2  flex items-center justify-center '>
         <Button

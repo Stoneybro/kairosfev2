@@ -14,6 +14,7 @@ import DatePicker from "@/components/dashboard/tasks/datePicker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCreateTask } from "@/hooks/useCreateTask";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import LoaderButton from "@/components/ui/loaderButton";
 function createSchema(availableBalance?: string) {
   return z
@@ -147,6 +148,7 @@ export default function CreateTaskForm({
 }: {
   smartAccount?: `0x${string}`;
 }) {
+  const router=useRouter()
   const { data: cardData, isLoading: cardDataIsLoading } = useQuery({
     queryKey: ["dashboardBalance", smartAccount],
     queryFn: () => fetchDashboardBalance(smartAccount as `0x${string}`),
@@ -192,14 +194,13 @@ export default function CreateTaskForm({
         ? Number(values.delayDays || 0) * 24 * 3600 +
           Number(values.delayHours || 0) * 3600
         : 0;
-    const now = new Date();
-    const defaultDeadline = Math.floor(now.getTime() / 1000) + 3600;
+    const nowSec = Math.floor(Date.now() / 1000);
     const payload = {
       taskDescription: values.description,
-      rewardAmount: parseEther(values.rewardEth), // bigint
+      rewardAmount: parseEther(values.rewardEth),
       deadlineInSeconds: values.deadline
-        ? BigInt(Math.floor(values.deadline.getTime() / 1000))
-        : BigInt(defaultDeadline),
+        ? BigInt(Math.floor(values.deadline.getTime() / 1000) - nowSec)
+        : 3600n, 
       penaltyChoice: values.penaltyType === PenaltyType.DELAY_PAYMENT ? 1 : 2,
       verificationMethod: values.verificationMethod,
       delayPayment: BigInt(delaySeconds),
@@ -210,10 +211,10 @@ export default function CreateTaskForm({
 
     try {
       console.log(payload);
-      createTask.mutate(payload);
       await createTask.mutateAsync(payload);
-      toast.success("Task Created Succesfully")
-      reset()
+      toast.success("Task Created Succesfully");
+      reset();
+      router.push("/dashboard")
       return true;
     } catch (err) {
       console.error("create task failed", err);

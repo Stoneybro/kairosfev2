@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import TableNav from "./nav";
 import { TableSkeleton } from "./tableSkeleton";
-import { fetchTasks, formatDate, formatNumber } from "@/utils/helpers";
+import { fetchTasks, formatDate, formatNumber, slugify } from "@/utils/helpers";
 import Createtaskbutton from "../tasks/create-task-button";
 import { DataTable } from "./data-table";
 import { columns } from "./column";
@@ -17,7 +17,7 @@ export function TaskTableWrapper({
   smartAccount: `0x${string}` | undefined;
 }) {
   const [page, setPage] = useState({
-    pending: 1,
+    active: 1,
     completed: 1,
     canceled: 1,
     expired: 1,
@@ -27,17 +27,18 @@ export function TaskTableWrapper({
 
   // Build one query per status
   const queries = {
-    pending: useQuery({
-      queryKey: ["tasks", smartAccount, "pending", page.pending],
+    active: useQuery({
+      queryKey: ["tasks", smartAccount, "active", page.active],
       queryFn: () =>
         fetchTasks(
           smartAccount as `0x${string}`,
           0,
-          (page.pending - 1) * limit,
+          (page.active - 1) * limit,
           limit
         ),
       enabled: !!smartAccount,
       staleTime: Infinity,
+      refetchOnWindowFocus: false,
     }),
     completed: useQuery({
       queryKey: ["tasks", smartAccount, "completed", page.completed],
@@ -81,7 +82,7 @@ export function TaskTableWrapper({
   const activeQuery = useMemo(() => {
     switch (activeTab) {
       case "Active tasks":
-        return queries.pending;
+        return queries.active;
       case "Completed tasks":
         return queries.completed;
       case "Canceled tasks":
@@ -89,7 +90,7 @@ export function TaskTableWrapper({
       case "Expired tasks":
         return queries.expired;
       default:
-        return queries.pending;
+        return queries.active;
     }
   }, [activeTab, queries]);
 
@@ -105,9 +106,10 @@ export function TaskTableWrapper({
     return <TableSkeleton error />;
   }
 
-  if (!activeQuery.data || activeQuery.data.length === 0) {
-    return <TableSkeleton noData />;
-  }
+
+
+
+
 
   return (
     <div className='flex flex-col gap-8'>
@@ -120,20 +122,21 @@ export function TaskTableWrapper({
         <Createtaskbutton />
       </div>
 
-      <DataTable
+      {(!activeQuery.data || activeQuery.data.length === 0)?<TableSkeleton noData />:<DataTable
         columns={columns}
         data={(activeQuery.data as TaskType[]).map((task) => ({
+          slug:slugify(task.description)+"-"+task.id,
           id: task.id,
           title: task.description,
-          rewardAmount:`${formatNumber(task.rewardAmount)} ETH` ,
-          deadline:formatDate(task.deadline),
+          rewardAmount: `${formatNumber(task.rewardAmount)} ETH`,
+          deadline: formatDate(task.deadline),
           status: task.status,
           choice: task.choice,
         }))}
         page={page}
         setPage={setPage}
         activeTab={activeTab}
-      />
+      />}
     </div>
   );
 }

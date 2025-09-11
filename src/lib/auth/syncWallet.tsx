@@ -5,7 +5,7 @@ import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import SvgLoading from "../../components/ui/svg-loading";
-import { activateWallet } from "@/hooks/useActivateWallet";
+
 
 async function doFetch(
   body: { walletAddress: string },

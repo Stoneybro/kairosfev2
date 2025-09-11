@@ -15,12 +15,7 @@ export type activeTabType =
   | "deposit"
   | "send";
 
-export const statusMap: Record<number, { label: string; color: string }> = {
-  0: { label: "active", color: "text-blue-500" },
-  1: { label: "completed", color: "text-green-500" },
-  2: { label: "canceled", color: "text-black" },
-  3: { label: "expired", color: "text-red-500" },
-};
+
 export type TaskType = {
   id: bigint;
   description: string;
@@ -32,12 +27,14 @@ export type TaskType = {
   delayDuration: bigint;
   buddyAddress?: `0x${string}` | undefined;
   delayedRewardReleased: boolean;
+  verificationMethod: number;
 };
 export type TaskTableData = {
+  slug:string;
   id: bigint;
- title: string;
-  rewardAmount: string | bigint; // Use string for large numbers
-  deadline: string | bigint; // Use string for large numbers
+  title: string;
+  rewardAmount: string | bigint; 
+  deadline: string | bigint; 
   status: number;
   choice: number;
 };
@@ -48,11 +45,26 @@ export enum TaskStatus {
   CANCELED = 2,
   EXPIRED = 3,
 }
-const STATUS_MAP = {
+const TASK_STATUS_MAP = {
   "Active tasks": 0,
   "Completed tasks": 1,
   "Canceled tasks": 2,
   "Expired tasks": 3,
 } as const;
+export const SLUG_STATUS_MAP: Record<string, number> = {
+  "active-tasks": 0,
+  "completed-tasks": 1,
+  "canceled-tasks": 2,
+  "expired-tasks": 3,
+};
+export enum VERIFICATION_ENUM {
+  "Manual" = 0,
+  "Partner" = 1,
+  "AI" = 2,
+}
+export enum PENALTY_ENUM {
+  "Delay Payment" = 1,
+  "Send to Partner" = 2,
+}
 
-export type TabKey = keyof typeof STATUS_MAP;
+export type TabKey = keyof typeof TASK_STATUS_MAP;

@@ -37,6 +37,36 @@ export function formatDate(date: bigint) {
     minute: "2-digit",
   });
 }
+export function slugify(str: string) {
+  return str
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+}
+export function parseSlug(slug: string) {
+  if (!slug) return null;
+
+  const parts = slug.split("-");
+  const rawId = parts.pop(); // last piece is id
+  try {
+    return toSerializable({ id: BigInt(rawId!) });
+  } catch {
+    return null;
+  }
+}
+export function formatTime(seconds: number): string {
+  const days = Math.floor(seconds / 86400); // 24 * 3600
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+
+  const parts: string[] = [];
+  if (days > 0) parts.push(`${days} day${days > 1 ? "s" : ""}`);
+  if (hours > 0) parts.push(`${hours} hr${hours > 1 ? "s" : ""}`);
+  if (minutes > 0) parts.push(`${minutes} min${minutes > 1 ? "s" : ""}`);
+
+  return parts.join(" ") || "0 min";
+}
+
 
 
 export async function fetchDashboardBalance(
@@ -94,11 +124,12 @@ export async function fetchTasksCount(smartAccount: `0x${string}`) {
   });
   return toSerializable(result);
 }
-export async function getTasksByStatus(smartAccount: `0x${string}`) {
+export async function fetchTasksById(smartAccount: `0x${string}`, id: bigint) {
   const result = await readContract({
     address: smartAccount,
     abi: SMART_ACCOUNT_ABI,
-    functionName: "getTasksByStatus",
+    functionName: "getTask",
+    args: [id],
   });
   return toSerializable(result);
 }

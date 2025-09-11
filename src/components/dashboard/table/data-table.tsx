@@ -1,10 +1,8 @@
 "use client";
-
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import {
@@ -18,31 +16,40 @@ import {
 import { TablePagination } from "./pagination";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { TabKey } from "@/types";
+import { TabKey, TaskTableData } from "@/types";
 
-
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  page: { pending: number; completed: number; canceled: number; expired: number };
-  setPage: React.Dispatch<React.SetStateAction<{ pending: number; completed: number; canceled: number; expired: number }>>;
+interface DataTableProps<TValue> {
+  columns: ColumnDef<TaskTableData, TValue>[];
+  data: TaskTableData[];
+  page: {
+    active: number;
+    completed: number;
+    canceled: number;
+    expired: number;
+  };
+  setPage: React.Dispatch<
+    React.SetStateAction<{
+      active: number;
+      completed: number;
+      canceled: number;
+      expired: number;
+    }>
+  >;
   activeTab: TabKey;
 }
 
-
-export function DataTable<TData, TValue>({
+export function DataTable<TValue>({
   columns,
   data,
   page,
   setPage,
-  activeTab
-}: DataTableProps<TData, TValue>) {
+  activeTab,
+}: DataTableProps<TValue>) {
   const router = useRouter();
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    
   });
   const statusSlug = activeTab.toLowerCase().replace(/\s+/g, "-");
   return (
@@ -51,8 +58,7 @@ export function DataTable<TData, TValue>({
         <Table>
           <TableHeader className='bg-muted'>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}
-              >
+              <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
@@ -78,12 +84,16 @@ export function DataTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className='cursor-pointer'
-                  onClick={()=>router.push(`/dashboard/${statusSlug.toLowerCase()}/${row.id.toString()}`)}
+                  onClick={() =>
+                    router.push(
+                      `/dashboard/${statusSlug}/${row.original.slug.toString()}`
+                    )
+                  }
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className='pl-4 py-4'>
                       <Link
-                        href={`/dashboard/${statusSlug.toLowerCase()}/${row.id.toString()}`}
+                        href={`/dashboard/${statusSlug}/${row.original.slug.toString()}`}
                         className='block w-full h-full'
                       >
                         {flexRender(

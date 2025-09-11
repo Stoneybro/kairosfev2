@@ -33,10 +33,10 @@ export function TableSkeleton({ error, noData }: TableSkeletonProps) {
   return (
     <>
 
-      <div className="flex justify-between items-center">
+      {!noData &&<div className="flex justify-between items-center">
         <Skeleton className='h-8 w-32 border' />
-        {noData?<Createtaskbutton />: <Skeleton className='h-8 w-32 border' />}
-      </div>
+        <Skeleton className='h-8 w-32 border' />
+      </div>}
       <div className='w-full border rounded'>
         <Table>
           <TableHeader className='bg-muted'>
@@ -64,7 +64,7 @@ export function TableSkeleton({ error, noData }: TableSkeletonProps) {
                   className='h-24 text-center'
                 >
                   {error && `Error Fetching tasks`}
-                  {noData && `Create a new task`}
+                  {noData && `No tasks available`}
                 </TableCell>
               </TableRow>
             ) : (

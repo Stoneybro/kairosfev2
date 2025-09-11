@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { TaskType, statusMap } from "@/types";
+import { PENALTY_ENUM, TaskStatus, TaskType, VERIFICATION_ENUM } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { PiSpinner } from "react-icons/pi";
 import { BiCoinStack } from "react-icons/bi";
@@ -9,151 +9,168 @@ import { IoCalendarOutline } from "react-icons/io5";
 import { PiClockClockwiseLight } from "react-icons/pi";
 import { BsSignpostSplit } from "react-icons/bs";
 import { LuScanQrCode } from "react-icons/lu";
-import { formatDate, formatNumber } from "@/utils/helpers";
-import { formatEther } from "viem";
-import { fetchTasks } from "@/utils/helpers";
-import { Skeleton } from "@/components/ui/skeleton";
+import Taskskeleton from "./task-skeleton";
+import {
+  fetchTasksById,
+  formatDate,
+  formatNumber,
+  formatTime,
+  parseSlug,
+} from "@/utils/helpers";
+
 import LoaderButton from "@/components/ui/loaderButton";
 import { useCompleteTask } from "@/hooks/useCompleteTask";
 import { toast } from "sonner";
 import { useCancelTask } from "@/hooks/useCancelTask";
+import { useMemo } from "react";
+import { useRouter } from "next/navigation";
 
 function Tasks({
-  id,
-  status,
+  slug,
+
   smartAccount,
 }: {
-  id: string;
-  status: number;
+  slug: string;
+
   smartAccount: `0x${string}`;
 }) {
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["tasks", smartAccount],
-    queryFn: () => fetchTasks(smartAccount, status, 0, 7),
+  const router = useRouter();
+  const parsed = useMemo(() => parseSlug(slug), [slug]);
+  const {
+    data: taskData,
+    error,
+    isLoading,
+  } = useQuery<TaskType>({
+    queryKey: ["taskById", smartAccount, parsed?.id],
+    queryFn: () => fetchTasksById(smartAccount, parsed!.id),
+    enabled: !!parsed && !!smartAccount,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     staleTime: Infinity,
   });
   const completeTask = useCompleteTask(smartAccount);
-  const cancelTask=useCancelTask(smartAccount)
-  console.log(data);
-  if (isLoading && !data) return <div className=''>Loading...</div>;
-  const taskData = data?.find((t: TaskType) => t.id.toString() === id);
+  const cancelTask = useCancelTask(smartAccount);
+  if (isLoading)
+    return (
+      <div>
+        <Taskskeleton />
+      </div>
+    );
+  if (error)
+    return (
+      <div className='flex h-full w-full text-lg justify-center items-center'>
+        Error loading task
+      </div>
+    );
+  if (!taskData)
+    return (
+      <div className='flex h-full w-full text-lg justify-center items-center'>
+        No task found
+      </div>
+    );
 
-  const statusLabel = statusMap[taskData.status] ?? {
-    label: "unavailable",
-    color: "red",
-  };
   async function handleComplete(id: string): Promise<boolean> {
     const payLoad = BigInt(id);
     try {
-      completeTask.mutate(payLoad);
       await completeTask.mutateAsync(payLoad);
-      toast.success("Task Completed Successfully")
+      toast.success("Task Completed Successfully");
+      router.push("/dashboard");
       return true;
     } catch (error) {
-      console.log(error);
+      console.log("Error completing task:", error);
       toast.error("Task Completion Failed");
       return false;
     }
   }
-    async function handleCancel(id: string) {
+  async function handleCancel(id: string) {
     const payLoad = BigInt(id);
     try {
-      cancelTask.mutate(payLoad);
       await cancelTask.mutateAsync(payLoad);
-      toast.success("Task Canceled Successfully")
-      return true
+      toast.success("Task Canceled Successfully");
+      router.push("/dashboard");
+      return true;
     } catch (error) {
-      console.log(error)
-      toast.error("Task Cancelation Failed")
-      return false
+      console.log("Error canceling task:", error);
+      toast.error("Task Cancelation Failed");
+      return false;
     }
   }
 
   return (
     <div className='flex flex-col gap-6'>
-      <div className='text-2xl'>
-        {!isLoading ? taskData.description : <Skeleton className='w-10 h-4' />}
-      </div>
+      <div className='text-2xl'>{taskData.description}</div>
       <div className='flex flex-col justify-start items-start max-w-sm gap-4'>
         <div className='flex justify-between items-center w-full'>
           <span className='text-muted-foreground flex items-center gap-1'>
             <PiSpinner /> status
           </span>
-          <Badge variant={"outline"}>
-            {!isLoading ? statusLabel.label : <Skeleton className='w-10 h-4' />}
-          </Badge>
+          <Badge variant={"outline"}>{TaskStatus[taskData.status]}</Badge>
         </div>
         <div className='flex justify-between items-center w-full'>
           <span className='text-muted-foreground flex items-center gap-1'>
             <BiCoinStack /> reward
           </span>
-          <span>
-            {!isLoading ? (
-              formatNumber(taskData.rewardAmount)
-            ) : (
-              <Skeleton className='w-10 h-4' />
-            )}{" "}
-            ETH
-          </span>
+          <span>{formatNumber(taskData.rewardAmount)} ETH</span>
         </div>
         <div className='flex justify-between items-center w-full'>
           <span className='text-muted-foreground flex items-center gap-1'>
             <IoCalendarOutline /> deadline
           </span>
-          <span>
-            {!isLoading ? (
-              formatDate(taskData.deadline)
-            ) : (
-              <Skeleton className='w-10 h-4' />
-            )}
-          </span>
-        </div>
-        <div className='flex justify-between items-center w-full'>
-          <span className='text-muted-foreground flex items-center gap-1'>
-            <PiClockClockwiseLight /> time left
-          </span>
-          <span>Active</span>
+          <span>{formatDate(taskData.deadline)}</span>
         </div>
         <div className='flex justify-between items-center w-full'>
           <span className='text-muted-foreground flex items-center gap-1'>
             <BsSignpostSplit /> penalty choice
           </span>
-          <span>{taskData.choice}</span>
+          <span>{PENALTY_ENUM[taskData.choice]}</span>
         </div>
+        {taskData.choice == 1 &&
+          (taskData.status == 0 || taskData.status == 3) && (
+            <div className='flex justify-between items-center w-full'>
+              <span className='text-muted-foreground flex items-center gap-1'>
+                <PiClockClockwiseLight /> Delay duration
+              </span>
+              <span>{formatTime(Number(taskData.delayDuration))}</span>
+            </div>
+          )}
+        {taskData.choice == 2 &&
+          (taskData.status == 0 || taskData.status == 3) && (
+            <div className='flex justify-between items-center w-full'>
+              <span className='text-muted-foreground flex items-center gap-1'>
+                <PiClockClockwiseLight /> partner address
+              </span>
+              <span>{taskData.buddyAddress}</span>
+            </div>
+          )}
+
         <div className='flex justify-between items-center w-full'>
           <span className='text-muted-foreground flex items-center gap-1'>
             <LuScanQrCode /> verification method
           </span>
-          <span>{taskData.verificationMethod}</span>
+          <span>{VERIFICATION_ENUM[taskData.verificationMethod]}</span>
         </div>
       </div>
-      <div className='flex justify-between items-center max-w-sm'>
-        <LoaderButton
-        className=''
-          idleText='Cancel Task'
-          loadingText='Cancelling'
-          successText='Task Canceled!'
-          timeoutMs={60000}
-            executeAction={async () => {
-            let success = false;
-              success = await handleCancel(taskData.id);
-            return success;
-          }}
-        />
-        <LoaderButton
-        className=''
-          idleText='Complete Task'
-          loadingText='Completing...'
-          successText='Task Completed!'
-          timeoutMs={60000}
-          executeAction={async () => {
-            let success = false;
-              success = await handleComplete(taskData.id);
-            return success;
-          }}/>
-      </div>
+      {taskData.status == 0 && (
+        <div className='flex justify-start gap-4 items-center max-w-sm'>
+          <LoaderButton
+            className=''
+            idleText='Complete Task'
+            loadingText='Completing...'
+            successText='Task Completed!'
+            timeoutMs={60000}
+            executeAction={() => handleComplete(taskData.id.toString())}
+          />
+          <LoaderButton
+            className=''
+            idleText='Cancel Task'
+            loadingText='Cancelling'
+            successText='Task Canceled!'
+            timeoutMs={60000}
+            variant='secondary'
+            executeAction={() => handleCancel(taskData.id.toString())}
+          />
+        </div>
+      )}
     </div>
   );
 }
