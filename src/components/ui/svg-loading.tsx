@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function SvgLoading() {
   return (
@@ -9,6 +8,7 @@ export default function SvgLoading() {
         <source src='/kairossymbol.webm' type='video/webm' />
         <img src='/kairossymbol.gif' alt='Loading...' width={64} height={64} />
       </video>
+
     </div>
   );
 }

@@ -45,7 +45,7 @@ export enum TaskStatus {
   CANCELED = 2,
   EXPIRED = 3,
 }
-const TASK_STATUS_MAP = {
+export const TASK_STATUS_MAP = {
   "Active tasks": 0,
   "Completed tasks": 1,
   "Canceled tasks": 2,

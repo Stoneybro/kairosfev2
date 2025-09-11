@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TablePagination } from "./pagination";
+import { ServerPagination } from "./pagination";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { TabKey, TaskTableData } from "@/types";
@@ -36,6 +36,8 @@ interface DataTableProps<TValue> {
     }>
   >;
   activeTab: TabKey;
+  statusCount: number;
+  itemsPerPage: number;
 }
 
 export function DataTable<TValue>({
@@ -44,14 +46,36 @@ export function DataTable<TValue>({
   page,
   setPage,
   activeTab,
+  statusCount,
+  itemsPerPage,
 }: DataTableProps<TValue>) {
+  const tabToPageKey: Record<TabKey, keyof typeof page> = {
+    "Active tasks": "active",
+    "Completed tasks": "completed",
+    "Canceled tasks": "canceled",
+    "Expired tasks": "expired",
+  };
   const router = useRouter();
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
   });
   const statusSlug = activeTab.toLowerCase().replace(/\s+/g, "-");
+  const pageKey = tabToPageKey[activeTab] as keyof typeof page;
+  const currentPage = page[pageKey] ?? 1;
+  const totalPages =
+    statusCount && itemsPerPage > 0
+      ? Math.max(1, Math.ceil(statusCount / itemsPerPage))
+      : 1;
+  const handlePageChange = (newPage: number) => {
+    setPage((prev) => ({
+      ...prev,
+      [pageKey]: newPage,
+    }));
+  };
+
   return (
     <>
       <div className={`w-full  border rounded`}>
@@ -118,7 +142,13 @@ export function DataTable<TValue>({
           </TableBody>
         </Table>
       </div>
-      <TablePagination table={table} />
+      <ServerPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        totalItems={statusCount}
+        itemsPerPage={itemsPerPage}
+      />
     </>
   );
 }

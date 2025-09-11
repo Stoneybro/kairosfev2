@@ -4,11 +4,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import TableNav from "./nav";
 import { TableSkeleton } from "./tableSkeleton";
-import { fetchTasks, formatDate, formatNumber, slugify } from "@/utils/helpers";
+import {
+  fetchTasks,
+  fetchTasksCount,
+  formatDate,
+  formatNumber,
+  slugify,
+} from "@/utils/helpers";
 import Createtaskbutton from "../tasks/create-task-button";
 import { DataTable } from "./data-table";
 import { columns } from "./column";
-import { TaskType } from "@/types";
+import { TASK_STATUS_MAP, TaskType } from "@/types";
 import { TabKey } from "@/types";
 
 export function TaskTableWrapper({
@@ -24,7 +30,16 @@ export function TaskTableWrapper({
   });
   const [activeTab, setActiveTab] = useState<TabKey>("Active tasks");
   const limit = 7;
-
+  const {
+    data: taskCount,
+    isLoading:taskCountIsLoading,
+    error:taskCountError,
+  } = useQuery({
+    queryKey: ["taskCount", smartAccount],
+    queryFn: () => fetchTasksCount(smartAccount as `0x${string}`),
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
+  });
   // Build one query per status
   const queries = {
     active: useQuery({
@@ -98,18 +113,16 @@ export function TaskTableWrapper({
     return <TableSkeleton error />;
   }
 
-  if (activeQuery.isLoading) {
+  if (activeQuery.isLoading &&taskCountIsLoading) {
     return <TableSkeleton />;
   }
 
-  if (activeQuery.error) {
+  if (activeQuery.error&&taskCountError) {
     return <TableSkeleton error />;
   }
 
-
-
-
-
+  const task = activeQuery.data;
+  const statusCount = taskCount[TASK_STATUS_MAP[activeTab]];
 
   return (
     <div className='flex flex-col gap-8'>
@@ -122,21 +135,27 @@ export function TaskTableWrapper({
         <Createtaskbutton />
       </div>
 
-      {(!activeQuery.data || activeQuery.data.length === 0)?<TableSkeleton noData />:<DataTable
-        columns={columns}
-        data={(activeQuery.data as TaskType[]).map((task) => ({
-          slug:slugify(task.description)+"-"+task.id,
-          id: task.id,
-          title: task.description,
-          rewardAmount: `${formatNumber(task.rewardAmount)} ETH`,
-          deadline: formatDate(task.deadline),
-          status: task.status,
-          choice: task.choice,
-        }))}
-        page={page}
-        setPage={setPage}
-        activeTab={activeTab}
-      />}
+      {!task || task.length === 0 ? (
+        <TableSkeleton noData />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={(task as TaskType[]).map((task) => ({
+            slug: slugify(task.description) + "-" + task.id,
+            id: task.id,
+            title: task.description,
+            rewardAmount: `${formatNumber(task.rewardAmount)} ETH`,
+            deadline: formatDate(task.deadline),
+            status: task.status,
+            choice: task.choice,
+          }))}
+         page={page}
+          setPage={setPage}
+          activeTab={activeTab}
+          statusCount={statusCount}
+          itemsPerPage={limit}
+        />
+      )}
     </div>
   );
 }

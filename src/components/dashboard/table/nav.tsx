@@ -21,6 +21,7 @@ export default function TableNav({activeTab,setActiveTab,smartAccount}: TableNav
 const{data,isLoading,error}=useQuery({
   queryKey:["taskCount",smartAccount],
   queryFn:()=>fetchTasksCount(smartAccount),
+  refetchOnWindowFocus:false,
   staleTime:Infinity
 })
   const activeTaskCount = isLoading?0:data[0]
