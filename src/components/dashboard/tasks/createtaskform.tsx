@@ -189,6 +189,7 @@ export default function CreateTaskForm({
   const penaltyType = watch("penaltyType");
 
   async function handleCreate(values: FormValues) {
+    if (!isValid) return false; 
     const delaySeconds =
       values.delayDays || values.delayHours
         ? Number(values.delayDays || 0) * 24 * 3600 +
@@ -196,6 +197,7 @@ export default function CreateTaskForm({
         : 0;
     const nowSec = Math.floor(Date.now() / 1000);
     const payload = {
+      taskTitle:values.title,
       taskDescription: values.description,
       rewardAmount: parseEther(values.rewardEth),
       deadlineInSeconds: values.deadline
@@ -210,7 +212,6 @@ export default function CreateTaskForm({
     };
 
     try {
-      console.log(payload);
       await createTask.mutateAsync(payload);
       toast.success("Task Created Succesfully");
       reset();
@@ -218,7 +219,6 @@ export default function CreateTaskForm({
       return true;
     } catch (err) {
       console.error("create task failed", err);
-      console.log(err);
       toast.error("Task Creation Failed");
       return false;
     }
@@ -446,12 +446,12 @@ export default function CreateTaskForm({
           idleText='Create Task'
           loadingText='Creating...'
           successText='Task Created!'
-          disabled={!isValid || isSubmitting}
+          disabled={ isSubmitting}
           timeoutMs={60000}
           executeAction={async () => {
             let success = false;
             await handleSubmit(async (values) => {
-              success = await handleCreate(values); // handleCreate must return boolean
+              success = await handleCreate(values); 
             })();
             return success;
           }}

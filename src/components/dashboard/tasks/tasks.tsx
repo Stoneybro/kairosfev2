@@ -48,8 +48,8 @@ function Tasks({
     refetchOnReconnect: false,
     staleTime: Infinity,
   });
-  const completeTask = useCompleteTask(smartAccount);
-  const cancelTask = useCancelTask(smartAccount);
+  const completeTask = useCompleteTask(smartAccount,parsed?.id);
+  const cancelTask = useCancelTask(smartAccount,parsed?.id);
   if (isLoading)
     return (
       <div>
@@ -98,7 +98,7 @@ function Tasks({
 
   return (
     <div className='flex flex-col gap-6'>
-      <div className='text-2xl'>{taskData.description}</div>
+      <div className='text-2xl'>{taskData.title}</div>
       <div className='flex flex-col justify-start items-start max-w-sm gap-4'>
         <div className='flex justify-between items-center w-full'>
           <span className='text-muted-foreground flex items-center gap-1'>

@@ -89,6 +89,8 @@ export default function SyncWalletAfterLogin() {
     window.addEventListener("online", onOnline);
     return () => window.removeEventListener("online", onOnline);
   }, [queryClient, wallet]);
+
+  
   useEffect(() => {
     if (!query.isFetched) return;
     (async () => {
@@ -111,18 +113,6 @@ export default function SyncWalletAfterLogin() {
     })();
   }, [query.isFetched, query.isError, query.data, router]);
 
-  if (
-    query.isFetching ||
-    (!query.isFetched && ready && authenticated && wallet)
-  ) {
-    return (
-      <div className=' absolute top-0 left-0 w-full h-full flex items-center justify-center bg-white/80 z-50 inset-0'>
-        <div className='max-w-sm'>
-          <SvgLoading />
-        </div>
-      </div>
-    );
-  }
 
   return null;
 }

@@ -7,7 +7,13 @@ type LoadingButtonProps = {
   idleText: string;
   loadingText: string;
   successText: string;
-  variant?: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost";
+  variant?:
+    | "link"
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost";
   className?: string;
   disabled?: boolean;
   timeoutMs?: number; // optional
@@ -28,7 +34,7 @@ export default function LoaderButton({
 
   useEffect(() => {
     return () => {
-      if (timer) clearTimeout(timer); 
+      if (timer) clearTimeout(timer);
     };
   }, [timer]);
 
@@ -67,12 +73,13 @@ export default function LoaderButton({
 
   return (
     <Button
+      type='button'
       variant={variant}
       onClick={startAction}
       className={`${className} flex items-center justify-center`}
       disabled={status === "loading" || disabled || status === "success"}
     >
-      {status === "loading" && <Loader2 className="animate-spin mr-2" />}
+      {status === "loading" && <Loader2 className='animate-spin mr-2' />}
       {getLabel()}
     </Button>
   );

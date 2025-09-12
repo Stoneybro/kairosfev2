@@ -4,37 +4,26 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { encodeFunctionData } from "viem";
 import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
 
-type CreateTaskArgsType = {
-  taskTitle: string;
-  taskDescription: string;
-  rewardAmount: bigint;
-  deadlineInSeconds: bigint;
-  penaltyChoice: number;
-  verificationMethod: number;
-  sendBuddy?: `0x${string}`;
-  delayPayment?: bigint;
+type SendArgsType = {
+  address:`0x${string}`;
+  amount: bigint;
 };
 
-export function useCreateTask(smartAccount: `0x${string}`) {
+export function useSend(smartAccount: `0x${string}`) {
   const { initClient } = useSmartAccount();
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payLoad: CreateTaskArgsType) => {
+    mutationFn: async (payLoad: SendArgsType) => {
       const client = await initClient();
       if (!client) throw new Error("Smart account not initialized");
       const callData = encodeFunctionData({
         abi: SMART_ACCOUNT_ABI,
-        functionName: "createTask",
+        functionName: "execute",
         args: [
-          payLoad.taskTitle,
-          payLoad.taskDescription,
-          payLoad.rewardAmount,
-          payLoad.deadlineInSeconds,
-          payLoad.penaltyChoice,
-          payLoad.delayPayment ?? 0n,
-          payLoad.sendBuddy ?? "0x0000000000000000000000000000000000000000",
-          payLoad.verificationMethod,
+          payLoad.address,
+          payLoad.amount,
+            "0x",
         ],
       });
 

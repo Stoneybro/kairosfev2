@@ -1,14 +1,11 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 
 export default function SvgLoading() {
   return (
     <div className=''>
-      <video autoPlay loop muted playsInline width={64} height={64}>
-        <source src='/kairossymbol.webm' type='video/webm' />
-        <img src='/kairossymbol.gif' alt='Loading...' width={64} height={64} />
-      </video>
-
+      <Image src={"/kairossymbol.svg"} width={150} height={150} alt="Kairos Loader" />
     </div>
   );
 }

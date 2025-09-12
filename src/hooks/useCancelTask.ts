@@ -4,9 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { encodeFunctionData } from "viem";
 import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
 
-
-
-export function useCancelTask(smartAccount: `0x${string}`) {
+export function useCancelTask(smartAccount: `0x${string}`, id: string) {
   const { initClient } = useSmartAccount();
   const qc = useQueryClient();
 
@@ -17,9 +15,7 @@ export function useCancelTask(smartAccount: `0x${string}`) {
       const callData = encodeFunctionData({
         abi: SMART_ACCOUNT_ABI,
         functionName: "cancelTask",
-        args: [
-          payLoad
-        ],
+        args: [payLoad],
       });
       const hash = await client.sendUserOperation({
         account: client.account,
@@ -37,8 +33,8 @@ export function useCancelTask(smartAccount: `0x${string}`) {
     onSuccess: (data, payLoad) => {
       qc.invalidateQueries({ queryKey: ["tasks", smartAccount] });
       qc.invalidateQueries({ queryKey: ["dashboardBalance", smartAccount] });
-      qc.invalidateQueries({ queryKey: ["taskCount",smartAccount] });
-      
+      qc.invalidateQueries({ queryKey: ["taskCount", smartAccount] });
+      qc.invalidateQueries({ queryKey: ["taskById", smartAccount, id] });
     },
     onError: (err, payLoad, context: any) => {
       console.log(err);

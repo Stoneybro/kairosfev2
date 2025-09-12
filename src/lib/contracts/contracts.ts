@@ -1,1152 +1,1172 @@
 export const SMART_ACCOUNT_ABI = [
   {
-    "type": "fallback",
-    "stateMutability": "payable"
+    type: "constructor",
+    inputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "receive",
-    "stateMutability": "payable"
+    type: "fallback",
+    stateMutability: "payable",
   },
   {
-    "type": "function",
-    "name": "PENALTY_DELAYEDPAYMENT",
-    "inputs": [],
-    "outputs": [
+    type: "receive",
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    name: "PENALTY_DELAYEDPAYMENT",
+    inputs: [],
+    outputs: [
       {
-        "name": "",
-        "type": "uint8",
-        "internalType": "uint8"
-      }
+        name: "",
+        type: "uint8",
+        internalType: "uint8",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "function",
-    "name": "PENALTY_SENDBUDDY",
-    "inputs": [],
-    "outputs": [
+    type: "function",
+    name: "PENALTY_SENDBUDDY",
+    inputs: [],
+    outputs: [
       {
-        "name": "",
-        "type": "uint8",
-        "internalType": "uint8"
-      }
+        name: "",
+        type: "uint8",
+        internalType: "uint8",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "function",
-    "name": "addDeposit",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "payable"
+    type: "function",
+    name: "addDeposit",
+    inputs: [],
+    outputs: [],
+    stateMutability: "payable",
   },
   {
-    "type": "function",
-    "name": "cancelTask",
-    "inputs": [
+    type: "function",
+    name: "cancelTask",
+    inputs: [
       {
-        "name": "taskId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+        name: "taskId",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "completeTask",
-    "inputs": [
+    type: "function",
+    name: "completeTask",
+    inputs: [
       {
-        "name": "taskId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+        name: "taskId",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "completeTaskWithAttestation",
-    "inputs": [
+    type: "function",
+    name: "completeTaskWithAttestation",
+    inputs: [
       {
-        "name": "taskId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+        name: "taskId",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "createTask",
-    "inputs": [
+    type: "function",
+    name: "createTask",
+    inputs: [
       {
-        "name": "description",
-        "type": "string",
-        "internalType": "string"
+        name: "title",
+        type: "string",
+        internalType: "string",
       },
       {
-        "name": "rewardAmount",
-        "type": "uint256",
-        "internalType": "uint256"
+        name: "description",
+        type: "string",
+        internalType: "string",
       },
       {
-        "name": "deadlineInSeconds",
-        "type": "uint256",
-        "internalType": "uint256"
+        name: "rewardAmount",
+        type: "uint256",
+        internalType: "uint256",
       },
       {
-        "name": "choice",
-        "type": "uint8",
-        "internalType": "uint8"
+        name: "deadlineInSeconds",
+        type: "uint256",
+        internalType: "uint256",
       },
       {
-        "name": "delayDuration",
-        "type": "uint256",
-        "internalType": "uint256"
+        name: "choice",
+        type: "uint8",
+        internalType: "uint8",
       },
       {
-        "name": "buddy",
-        "type": "address",
-        "internalType": "address"
+        name: "delayDuration",
+        type: "uint256",
+        internalType: "uint256",
       },
       {
-        "name": "verificationMethod",
-        "type": "uint8",
-        "internalType": "uint8"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "execute",
-    "inputs": [
-      {
-        "name": "dest",
-        "type": "address",
-        "internalType": "address"
+        name: "buddy",
+        type: "address",
+        internalType: "address",
       },
       {
-        "name": "value",
-        "type": "uint256",
-        "internalType": "uint256"
+        name: "verificationMethod",
+        type: "uint8",
+        internalType: "uint8",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "execute",
+    inputs: [
+      {
+        name: "dest",
+        type: "address",
+        internalType: "address",
       },
       {
-        "name": "functionData",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "expiredTaskCallback",
-    "inputs": [
-      {
-        "name": "taskId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "getTask",
-    "inputs": [
-      {
-        "name": "taskId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "tuple",
-        "internalType": "struct ITaskManager.Task",
-        "components": [
-          {
-            "name": "id",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "description",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "rewardAmount",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "deadline",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "valid",
-            "type": "bool",
-            "internalType": "bool"
-          },
-          {
-            "name": "status",
-            "type": "uint8",
-            "internalType": "enum ITaskManager.TaskStatus"
-          },
-          {
-            "name": "choice",
-            "type": "uint8",
-            "internalType": "uint8"
-          },
-          {
-            "name": "delayDuration",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "buddy",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "delayedRewardReleased",
-            "type": "bool",
-            "internalType": "bool"
-          },
-          {
-            "name": "verificationMethod",
-            "type": "uint8",
-            "internalType": "enum ITaskManager.VerificationMethod"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getTaskCountsByStatus",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256[]",
-        "internalType": "uint256[]"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getTasksByStatus",
-    "inputs": [
-      {
-        "name": "status",
-        "type": "uint8",
-        "internalType": "enum ITaskManager.TaskStatus"
+        name: "value",
+        type: "uint256",
+        internalType: "uint256",
       },
       {
-        "name": "start",
-        "type": "uint256",
-        "internalType": "uint256"
+        name: "functionData",
+        type: "bytes",
+        internalType: "bytes",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "expiredTaskCallback",
+    inputs: [
+      {
+        name: "taskId",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "getTask",
+    inputs: [
+      {
+        name: "taskId",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        internalType: "struct ITaskManager.Task",
+        components: [
+          {
+            name: "id",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "title",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "description",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "rewardAmount",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "deadline",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "valid",
+            type: "bool",
+            internalType: "bool",
+          },
+          {
+            name: "status",
+            type: "uint8",
+            internalType: "enum ITaskManager.TaskStatus",
+          },
+          {
+            name: "choice",
+            type: "uint8",
+            internalType: "uint8",
+          },
+          {
+            name: "delayDuration",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "buddy",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "delayedRewardReleased",
+            type: "bool",
+            internalType: "bool",
+          },
+          {
+            name: "verificationMethod",
+            type: "uint8",
+            internalType: "enum ITaskManager.VerificationMethod",
+          },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getTaskCountsByStatus",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getTasksByStatus",
+    inputs: [
+      {
+        name: "status",
+        type: "uint8",
+        internalType: "enum ITaskManager.TaskStatus",
       },
       {
-        "name": "limit",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "tuple[]",
-        "internalType": "struct ITaskManager.Task[]",
-        "components": [
-          {
-            "name": "id",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "description",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "rewardAmount",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "deadline",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "valid",
-            "type": "bool",
-            "internalType": "bool"
-          },
-          {
-            "name": "status",
-            "type": "uint8",
-            "internalType": "enum ITaskManager.TaskStatus"
-          },
-          {
-            "name": "choice",
-            "type": "uint8",
-            "internalType": "uint8"
-          },
-          {
-            "name": "delayDuration",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "buddy",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "delayedRewardReleased",
-            "type": "bool",
-            "internalType": "bool"
-          },
-          {
-            "name": "verificationMethod",
-            "type": "uint8",
-            "internalType": "enum ITaskManager.VerificationMethod"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getTotalTasks",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "i_entryPoint",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "contract IEntryPoint"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "initialize",
-    "inputs": [
-      {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
+        name: "start",
+        type: "uint256",
+        internalType: "uint256",
       },
       {
-        "name": "entryPoint",
-        "type": "address",
-        "internalType": "address"
+        name: "limit",
+        type: "uint256",
+        internalType: "uint256",
       },
-      {
-        "name": "_taskManager",
-        "type": "address",
-        "internalType": "contract ITaskManager"
-      }
     ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "isValidSignature",
-    "inputs": [
+    outputs: [
       {
-        "name": "hash",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "signature",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes4",
-        "internalType": "bytes4"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "releaseDelayedPayment",
-    "inputs": [
-      {
-        "name": "taskId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "s_owner",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "s_totalCommittedReward",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "supportsInterface",
-    "inputs": [
-      {
-        "name": "interfaceId",
-        "type": "bytes4",
-        "internalType": "bytes4"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "pure"
-  },
-  {
-    "type": "function",
-    "name": "taskManager",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "contract ITaskManager"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "validateUserOp",
-    "inputs": [
-      {
-        "name": "userOp",
-        "type": "tuple",
-        "internalType": "struct UserOperation",
-        "components": [
+        name: "",
+        type: "tuple[]",
+        internalType: "struct ITaskManager.Task[]",
+        components: [
           {
-            "name": "sender",
-            "type": "address",
-            "internalType": "address"
+            name: "id",
+            type: "uint256",
+            internalType: "uint256",
           },
           {
-            "name": "nonce",
-            "type": "uint256",
-            "internalType": "uint256"
+            name: "title",
+            type: "string",
+            internalType: "string",
           },
           {
-            "name": "initCode",
-            "type": "bytes",
-            "internalType": "bytes"
+            name: "description",
+            type: "string",
+            internalType: "string",
           },
           {
-            "name": "callData",
-            "type": "bytes",
-            "internalType": "bytes"
+            name: "rewardAmount",
+            type: "uint256",
+            internalType: "uint256",
           },
           {
-            "name": "callGasLimit",
-            "type": "uint256",
-            "internalType": "uint256"
+            name: "deadline",
+            type: "uint256",
+            internalType: "uint256",
           },
           {
-            "name": "verificationGasLimit",
-            "type": "uint256",
-            "internalType": "uint256"
+            name: "valid",
+            type: "bool",
+            internalType: "bool",
           },
           {
-            "name": "preVerificationGas",
-            "type": "uint256",
-            "internalType": "uint256"
+            name: "status",
+            type: "uint8",
+            internalType: "enum ITaskManager.TaskStatus",
           },
           {
-            "name": "maxFeePerGas",
-            "type": "uint256",
-            "internalType": "uint256"
+            name: "choice",
+            type: "uint8",
+            internalType: "uint8",
           },
           {
-            "name": "maxPriorityFeePerGas",
-            "type": "uint256",
-            "internalType": "uint256"
+            name: "delayDuration",
+            type: "uint256",
+            internalType: "uint256",
           },
           {
-            "name": "paymasterAndData",
-            "type": "bytes",
-            "internalType": "bytes"
+            name: "buddy",
+            type: "address",
+            internalType: "address",
           },
           {
-            "name": "signature",
-            "type": "bytes",
-            "internalType": "bytes"
-          }
-        ]
+            name: "delayedRewardReleased",
+            type: "bool",
+            internalType: "bool",
+          },
+          {
+            name: "verificationMethod",
+            type: "uint8",
+            internalType: "enum ITaskManager.VerificationMethod",
+          },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "getTotalTasks",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "i_entryPoint",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "contract IEntryPoint",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "initialize",
+    inputs: [
+      {
+        name: "owner",
+        type: "address",
+        internalType: "address",
       },
       {
-        "name": "userOpHash",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        name: "entryPoint",
+        type: "address",
+        internalType: "address",
       },
       {
-        "name": "missingAccountFunds",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+        name: "_taskManager",
+        type: "address",
+        internalType: "contract ITaskManager",
+      },
     ],
-    "outputs": [
-      {
-        "name": "validationData",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable"
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "withdrawDepositTo",
-    "inputs": [
+    type: "function",
+    name: "isValidSignature",
+    inputs: [
       {
-        "name": "withdrawAddress",
-        "type": "address",
-        "internalType": "address payable"
+        name: "hash",
+        type: "bytes32",
+        internalType: "bytes32",
       },
       {
-        "name": "amount",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+        name: "signature",
+        type: "bytes",
+        internalType: "bytes",
+      },
     ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    outputs: [
+      {
+        name: "",
+        type: "bytes4",
+        internalType: "bytes4",
+      },
+    ],
+    stateMutability: "view",
   },
   {
-    "type": "event",
-    "name": "DelayedPaymentReleased",
-    "inputs": [
+    type: "function",
+    name: "releaseDelayedPayment",
+    inputs: [
       {
-        "name": "taskId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
+        name: "taskId",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "s_owner",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "s_totalCommittedReward",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "supportsInterface",
+    inputs: [
+      {
+        name: "interfaceId",
+        type: "bytes4",
+        internalType: "bytes4",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    stateMutability: "pure",
+  },
+  {
+    type: "function",
+    name: "taskManager",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "contract ITaskManager",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "validateUserOp",
+    inputs: [
+      {
+        name: "userOp",
+        type: "tuple",
+        internalType: "struct UserOperation",
+        components: [
+          {
+            name: "sender",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "nonce",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "initCode",
+            type: "bytes",
+            internalType: "bytes",
+          },
+          {
+            name: "callData",
+            type: "bytes",
+            internalType: "bytes",
+          },
+          {
+            name: "callGasLimit",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "verificationGasLimit",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "preVerificationGas",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "maxFeePerGas",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "maxPriorityFeePerGas",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "paymasterAndData",
+            type: "bytes",
+            internalType: "bytes",
+          },
+          {
+            name: "signature",
+            type: "bytes",
+            internalType: "bytes",
+          },
+        ],
       },
       {
-        "name": "rewardAmount",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "DepositAdded",
-    "inputs": [
-      {
-        "name": "sender",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        name: "userOpHash",
+        type: "bytes32",
+        internalType: "bytes32",
       },
       {
-        "name": "amount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
+        name: "missingAccountFunds",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
-    "anonymous": false
+    outputs: [
+      {
+        name: "validationData",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "event",
-    "name": "DepositWithdrawn",
-    "inputs": [
+    type: "function",
+    name: "withdrawDepositTo",
+    inputs: [
       {
-        "name": "withdrawAddress",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        name: "withdrawAddress",
+        type: "address",
+        internalType: "address payable",
       },
       {
-        "name": "amount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
+        name: "amount",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
-    "anonymous": false
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "event",
-    "name": "DurationPenaltyApplied",
-    "inputs": [
+    type: "event",
+    name: "DelayedPaymentReleased",
+    inputs: [
       {
-        "name": "taskId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
+        name: "taskId",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
       },
       {
-        "name": "penaltyDuration",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      }
+        name: "rewardAmount",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
+      },
     ],
-    "anonymous": false
+    anonymous: false,
   },
   {
-    "type": "event",
-    "name": "Initialized",
-    "inputs": [
+    type: "event",
+    name: "DepositAdded",
+    inputs: [
       {
-        "name": "version",
-        "type": "uint64",
-        "indexed": false,
-        "internalType": "uint64"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "Initialized",
-    "inputs": [
-      {
-        "name": "owner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        name: "sender",
+        type: "address",
+        indexed: true,
+        internalType: "address",
       },
       {
-        "name": "entryPoint",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        name: "amount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "DepositWithdrawn",
+    inputs: [
+      {
+        name: "withdrawAddress",
+        type: "address",
+        indexed: true,
+        internalType: "address",
       },
       {
-        "name": "taskManager",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      }
+        name: "amount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
     ],
-    "anonymous": false
+    anonymous: false,
   },
   {
-    "type": "event",
-    "name": "NonceChanged",
-    "inputs": [
+    type: "event",
+    name: "DurationPenaltyApplied",
+    inputs: [
       {
-        "name": "nonce",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "PenaltyFundsReleasedToBuddy",
-    "inputs": [
-      {
-        "name": "taskId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
+        name: "taskId",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
       },
       {
-        "name": "rewardAmount",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
+        name: "penaltyDuration",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "Initialized",
+    inputs: [
+      {
+        name: "version",
+        type: "uint64",
+        indexed: false,
+        internalType: "uint64",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "Initialized",
+    inputs: [
+      {
+        name: "owner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
       },
       {
-        "name": "buddy",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "TaskCanceled",
-    "inputs": [
-      {
-        "name": "taskId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "TaskCompleted",
-    "inputs": [
-      {
-        "name": "taskId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "TaskCreated",
-    "inputs": [
-      {
-        "name": "taskId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
+        name: "entryPoint",
+        type: "address",
+        indexed: true,
+        internalType: "address",
       },
       {
-        "name": "description",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
+        name: "taskManager",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "NonceChanged",
+    inputs: [
+      {
+        name: "nonce",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "PenaltyFundsReleasedToBuddy",
+    inputs: [
+      {
+        name: "taskId",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
       },
       {
-        "name": "rewardAmount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
+        name: "rewardAmount",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
+      },
+      {
+        name: "buddy",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
     ],
-    "anonymous": false
+    anonymous: false,
   },
   {
-    "type": "event",
-    "name": "TaskExpired",
-    "inputs": [
+    type: "event",
+    name: "TaskCanceled",
+    inputs: [
       {
-        "name": "taskId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      }
+        name: "taskId",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
+      },
     ],
-    "anonymous": false
+    anonymous: false,
   },
   {
-    "type": "error",
-    "name": "ECDSAInvalidSignature",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "ECDSAInvalidSignatureLength",
-    "inputs": [
+    type: "event",
+    name: "TaskCompleted",
+    inputs: [
       {
-        "name": "length",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
+        name: "taskId",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
   },
   {
-    "type": "error",
-    "name": "ECDSAInvalidSignatureS",
-    "inputs": [
+    type: "event",
+    name: "TaskCreated",
+    inputs: [
       {
-        "name": "s",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "InvalidInitialization",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NotInitializing",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "ReentrancyGuardReentrantCall",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "SmartAccount__AddMoreFunds",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "SmartAccount__CannotWithdrawCommittedRewards",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "SmartAccount__ExecutionFailed",
-    "inputs": [
+        name: "taskId",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
+      },
       {
-        "name": "result",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ]
+        name: "description",
+        type: "string",
+        indexed: false,
+        internalType: "string",
+      },
+      {
+        name: "rewardAmount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
   },
   {
-    "type": "error",
-    "name": "SmartAccount__InvalidNonce",
-    "inputs": []
+    type: "event",
+    name: "TaskExpired",
+    inputs: [
+      {
+        name: "taskId",
+        type: "uint256",
+        indexed: true,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
   },
   {
-    "type": "error",
-    "name": "SmartAccount__InvalidPenaltyChoice",
-    "inputs": []
+    type: "error",
+    name: "ECDSAInvalidSignature",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__InvalidPenaltyConfig",
-    "inputs": []
+    type: "error",
+    name: "ECDSAInvalidSignatureLength",
+    inputs: [
+      {
+        name: "length",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__InvalidVerificationMethod",
-    "inputs": []
+    type: "error",
+    name: "ECDSAInvalidSignatureS",
+    inputs: [
+      {
+        name: "s",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+    ],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__NoTaskManagerLinked",
-    "inputs": []
+    type: "error",
+    name: "InvalidInitialization",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__NotFromEntryPoint",
-    "inputs": []
+    type: "error",
+    name: "NotInitializing",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__OnlyTaskManagerCanCall",
-    "inputs": []
+    type: "error",
+    name: "ReentrancyGuardReentrantCall",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__PayPrefundFailed",
-    "inputs": []
+    type: "error",
+    name: "SmartAccount__AddMoreFunds",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__PaymentAlreadyReleased",
-    "inputs": []
+    type: "error",
+    name: "SmartAccount__CannotWithdrawCommittedRewards",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__PenaltyDurationNotElapsed",
-    "inputs": []
+    type: "error",
+    name: "SmartAccount__ExecutionFailed",
+    inputs: [
+      {
+        name: "result",
+        type: "bytes",
+        internalType: "bytes",
+      },
+    ],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__PenaltyTypeMismatch",
-    "inputs": []
+    type: "error",
+    name: "SmartAccount__InvalidNonce",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__PickAPenalty",
-    "inputs": []
+    type: "error",
+    name: "SmartAccount__InvalidPenaltyChoice",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__RewardCannotBeZero",
-    "inputs": []
+    type: "error",
+    name: "SmartAccount__InvalidPenaltyConfig",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__TaskAlreadyCanceled",
-    "inputs": []
+    type: "error",
+    name: "SmartAccount__InvalidVerificationMethod",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__TaskAlreadyCompleted",
-    "inputs": []
+    type: "error",
+    name: "SmartAccount__NoTaskManagerLinked",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__TaskNotExpired",
-    "inputs": []
+    type: "error",
+    name: "SmartAccount__NotFromEntryPoint",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "SmartAccount__TaskRewardPaymentFailed",
-    "inputs": []
-  }
+    type: "error",
+    name: "SmartAccount__OnlyTaskManagerCanCall",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "SmartAccount__PayPrefundFailed",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "SmartAccount__PaymentAlreadyReleased",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "SmartAccount__PenaltyDurationNotElapsed",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "SmartAccount__PenaltyTypeMismatch",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "SmartAccount__PickAPenalty",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "SmartAccount__RewardCannotBeZero",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "SmartAccount__TaskAlreadyCanceled",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "SmartAccount__TaskAlreadyCompleted",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "SmartAccount__TaskNotExpired",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "SmartAccount__TaskRewardPaymentFailed",
+    inputs: [],
+  },
 ] as const;
 
 export const ACCOUNT_FACTORY_ABI = [
   {
-    "type": "constructor",
-    "inputs": [
+    type: "constructor",
+    inputs: [
       {
-        "name": "entryPoint",
-        "type": "address",
-        "internalType": "address"
+        name: "entryPoint",
+        type: "address",
+        internalType: "address",
       },
       {
-        "name": "taskManager",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "taskManager",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "stateMutability": "nonpayable"
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "createAccount",
-    "inputs": [
+    type: "function",
+    name: "createAccount",
+    inputs: [
       {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "owner",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "stateMutability": "nonpayable"
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "getAddressForUser",
-    "inputs": [
+    type: "function",
+    name: "getAddressForUser",
+    inputs: [
       {
-        "name": "user",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "user",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "predictedAddress",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "predictedAddress",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "function",
-    "name": "getEntryPoint",
-    "inputs": [],
-    "outputs": [
+    type: "function",
+    name: "getEntryPoint",
+    inputs: [],
+    outputs: [
       {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "function",
-    "name": "getImplementation",
-    "inputs": [],
-    "outputs": [
+    type: "function",
+    name: "getImplementation",
+    inputs: [],
+    outputs: [
       {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "function",
-    "name": "getTaskManager",
-    "inputs": [],
-    "outputs": [
+    type: "function",
+    name: "getTaskManager",
+    inputs: [],
+    outputs: [
       {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "function",
-    "name": "getUserClone",
-    "inputs": [
+    type: "function",
+    name: "getUserClone",
+    inputs: [
       {
-        "name": "user",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "user",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "function",
-    "name": "implementation",
-    "inputs": [],
-    "outputs": [
+    type: "function",
+    name: "implementation",
+    inputs: [],
+    outputs: [
       {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "function",
-    "name": "userClones",
-    "inputs": [
+    type: "function",
+    name: "userClones",
+    inputs: [
       {
-        "name": "user",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "user",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "clone",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "clone",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "event",
-    "name": "CloneCreated",
-    "inputs": [
+    type: "event",
+    name: "CloneCreated",
+    inputs: [
       {
-        "name": "clone",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        name: "clone",
+        type: "address",
+        indexed: true,
+        internalType: "address",
       },
       {
-        "name": "user",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        name: "user",
+        type: "address",
+        indexed: true,
+        internalType: "address",
       },
       {
-        "name": "salt",
-        "type": "bytes32",
-        "indexed": true,
-        "internalType": "bytes32"
-      }
+        name: "salt",
+        type: "bytes32",
+        indexed: true,
+        internalType: "bytes32",
+      },
     ],
-    "anonymous": false
+    anonymous: false,
   },
   {
-    "type": "error",
-    "name": "AccountFactory__InitializationFailed",
-    "inputs": []
+    type: "error",
+    name: "AccountFactory__InitializationFailed",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "AccountFactory__InvalidEntryPoint",
-    "inputs": []
+    type: "error",
+    name: "AccountFactory__InvalidEntryPoint",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "AccountFactory__InvalidTaskManager",
-    "inputs": []
+    type: "error",
+    name: "AccountFactory__InvalidTaskManager",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "AccountFactory__OnlyEntryPointCanCall",
-    "inputs": []
+    type: "error",
+    name: "AccountFactory__OnlyEntryPointCanCall",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "AccountFactory__UserAlreadyHasAccount",
-    "inputs": []
+    type: "error",
+    name: "AccountFactory__UserAlreadyHasAccount",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "ERC1167FailedCreateClone",
-    "inputs": []
-  }
+    type: "error",
+    name: "ERC1167FailedCreateClone",
+    inputs: [],
+  },
 ] as const;
 
 export const ENTRYPOINT_ABI = [
@@ -1948,474 +1968,474 @@ export const ENTRYPOINT_ABI = [
   { stateMutability: "payable", type: "receive" },
 ] as const;
 
-export const KAIROSFAUCET_ABI=[
+export const KAIROSFAUCET_ABI = [
   {
-    "type": "constructor",
-    "inputs": [
+    type: "constructor",
+    inputs: [
       {
-        "name": "_token",
-        "type": "address",
-        "internalType": "address"
+        name: "_token",
+        type: "address",
+        internalType: "address",
       },
       {
-        "name": "_dripAmount",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+        name: "_dripAmount",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
-    "stateMutability": "nonpayable"
+    stateMutability: "nonpayable",
   },
   {
-    "type": "fallback",
-    "stateMutability": "payable"
+    type: "fallback",
+    stateMutability: "payable",
   },
   {
-    "type": "receive",
-    "stateMutability": "payable"
+    type: "receive",
+    stateMutability: "payable",
   },
   {
-    "type": "function",
-    "name": "checkClaimStatus",
-    "inputs": [
+    type: "function",
+    name: "checkClaimStatus",
+    inputs: [
       {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "function",
-    "name": "claim",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    type: "function",
+    name: "claim",
+    inputs: [],
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "claimETH",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    type: "function",
+    name: "claimETH",
+    inputs: [],
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "dripAmount",
-    "inputs": [],
-    "outputs": [
+    type: "function",
+    name: "dripAmount",
+    inputs: [],
+    outputs: [
       {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "function",
-    "name": "hasClaimed",
-    "inputs": [
+    type: "function",
+    name: "hasClaimed",
+    inputs: [
       {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "function",
-    "name": "owner",
-    "inputs": [],
-    "outputs": [
+    type: "function",
+    name: "owner",
+    inputs: [],
+    outputs: [
       {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "function",
-    "name": "pause",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    type: "function",
+    name: "pause",
+    inputs: [],
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "paused",
-    "inputs": [],
-    "outputs": [
+    type: "function",
+    name: "paused",
+    inputs: [],
+    outputs: [
       {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "function",
-    "name": "renounceOwnership",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    type: "function",
+    name: "renounceOwnership",
+    inputs: [],
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "resetClaim",
-    "inputs": [
+    type: "function",
+    name: "resetClaim",
+    inputs: [
       {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "token",
-    "inputs": [],
-    "outputs": [
+    type: "function",
+    name: "token",
+    inputs: [],
+    outputs: [
       {
-        "name": "",
-        "type": "address",
-        "internalType": "contract IERC20"
-      }
+        name: "",
+        type: "address",
+        internalType: "contract IERC20",
+      },
     ],
-    "stateMutability": "view"
+    stateMutability: "view",
   },
   {
-    "type": "function",
-    "name": "transferOwnership",
-    "inputs": [
+    type: "function",
+    name: "transferOwnership",
+    inputs: [
       {
-        "name": "newOwner",
-        "type": "address",
-        "internalType": "address"
-      }
+        name: "newOwner",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "unpause",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    type: "function",
+    name: "unpause",
+    inputs: [],
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "updateDripAmount",
-    "inputs": [
+    type: "function",
+    name: "updateDripAmount",
+    inputs: [
       {
-        "name": "_amount",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+        name: "_amount",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "updateToken",
-    "inputs": [
+    type: "function",
+    name: "updateToken",
+    inputs: [
       {
-        "name": "_token",
-        "type": "address",
-        "internalType": "contract IERC20"
-      }
+        name: "_token",
+        type: "address",
+        internalType: "contract IERC20",
+      },
     ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "withdrawERC20",
-    "inputs": [
+    type: "function",
+    name: "withdrawERC20",
+    inputs: [
       {
-        "name": "_token",
-        "type": "address",
-        "internalType": "contract IERC20"
+        name: "_token",
+        type: "address",
+        internalType: "contract IERC20",
       },
       {
-        "name": "to",
-        "type": "address",
-        "internalType": "address"
+        name: "to",
+        type: "address",
+        internalType: "address",
       },
       {
-        "name": "amount",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+        name: "amount",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "function",
-    "name": "withdrawETH",
-    "inputs": [
+    type: "function",
+    name: "withdrawETH",
+    inputs: [
       {
-        "name": "to",
-        "type": "address",
-        "internalType": "address payable"
+        name: "to",
+        type: "address",
+        internalType: "address payable",
       },
       {
-        "name": "amount",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+        name: "amount",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    "type": "event",
-    "name": "Claimed",
-    "inputs": [
+    type: "event",
+    name: "Claimed",
+    inputs: [
       {
-        "name": "account",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        name: "account",
+        type: "address",
+        indexed: true,
+        internalType: "address",
       },
       {
-        "name": "amount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
+        name: "amount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
     ],
-    "anonymous": false
+    anonymous: false,
   },
   {
-    "type": "event",
-    "name": "DripAmountUpdated",
-    "inputs": [
+    type: "event",
+    name: "DripAmountUpdated",
+    inputs: [
       {
-        "name": "amount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
+        name: "amount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
     ],
-    "anonymous": false
+    anonymous: false,
   },
   {
-    "type": "event",
-    "name": "ERC20Withdrawn",
-    "inputs": [
+    type: "event",
+    name: "ERC20Withdrawn",
+    inputs: [
       {
-        "name": "token",
-        "type": "address",
-        "indexed": true,
-        "internalType": "contract IERC20"
+        name: "token",
+        type: "address",
+        indexed: true,
+        internalType: "contract IERC20",
       },
       {
-        "name": "to",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        name: "to",
+        type: "address",
+        indexed: true,
+        internalType: "address",
       },
       {
-        "name": "amount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
+        name: "amount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
     ],
-    "anonymous": false
+    anonymous: false,
   },
   {
-    "type": "event",
-    "name": "ETHWithdrawn",
-    "inputs": [
+    type: "event",
+    name: "ETHWithdrawn",
+    inputs: [
       {
-        "name": "to",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        name: "to",
+        type: "address",
+        indexed: true,
+        internalType: "address",
       },
       {
-        "name": "amount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
+        name: "amount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
     ],
-    "anonymous": false
+    anonymous: false,
   },
   {
-    "type": "event",
-    "name": "OwnershipTransferred",
-    "inputs": [
+    type: "event",
+    name: "OwnershipTransferred",
+    inputs: [
       {
-        "name": "previousOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        name: "previousOwner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
       },
       {
-        "name": "newOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
+        name: "newOwner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
     ],
-    "anonymous": false
+    anonymous: false,
   },
   {
-    "type": "event",
-    "name": "Paused",
-    "inputs": [
+    type: "event",
+    name: "Paused",
+    inputs: [
       {
-        "name": "account",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      }
+        name: "account",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
     ],
-    "anonymous": false
+    anonymous: false,
   },
   {
-    "type": "event",
-    "name": "ResetClaim",
-    "inputs": [
+    type: "event",
+    name: "ResetClaim",
+    inputs: [
       {
-        "name": "account",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
+        name: "account",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
     ],
-    "anonymous": false
+    anonymous: false,
   },
   {
-    "type": "event",
-    "name": "TokenUpdated",
-    "inputs": [
+    type: "event",
+    name: "TokenUpdated",
+    inputs: [
       {
-        "name": "token",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
+        name: "token",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
     ],
-    "anonymous": false
+    anonymous: false,
   },
   {
-    "type": "event",
-    "name": "Unpaused",
-    "inputs": [
+    type: "event",
+    name: "Unpaused",
+    inputs: [
       {
-        "name": "account",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      }
+        name: "account",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
     ],
-    "anonymous": false
+    anonymous: false,
   },
   {
-    "type": "error",
-    "name": "EnforcedPause",
-    "inputs": []
+    type: "error",
+    name: "EnforcedPause",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "ExpectedPause",
-    "inputs": []
+    type: "error",
+    name: "ExpectedPause",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "KairosFaucet__AddressAlreadyClaimed",
-    "inputs": []
+    type: "error",
+    name: "KairosFaucet__AddressAlreadyClaimed",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "KairosFaucet__InsufficientFaucetBalance",
-    "inputs": []
+    type: "error",
+    name: "KairosFaucet__InsufficientFaucetBalance",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "KairosFaucet__TokenAddressIsNotSet",
-    "inputs": []
+    type: "error",
+    name: "KairosFaucet__TokenAddressIsNotSet",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "KairosFaucet__TransferFailed",
-    "inputs": []
+    type: "error",
+    name: "KairosFaucet__TransferFailed",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "KairosFaucet__ZeroAddress",
-    "inputs": []
+    type: "error",
+    name: "KairosFaucet__ZeroAddress",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "OwnableInvalidOwner",
-    "inputs": [
+    type: "error",
+    name: "OwnableInvalidOwner",
+    inputs: [
       {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
+        name: "owner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
   },
   {
-    "type": "error",
-    "name": "OwnableUnauthorizedAccount",
-    "inputs": [
+    type: "error",
+    name: "OwnableUnauthorizedAccount",
+    inputs: [
       {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
+    ],
   },
   {
-    "type": "error",
-    "name": "ReentrancyGuardReentrantCall",
-    "inputs": []
+    type: "error",
+    name: "ReentrancyGuardReentrantCall",
+    inputs: [],
   },
   {
-    "type": "error",
-    "name": "SafeERC20FailedOperation",
-    "inputs": [
+    type: "error",
+    name: "SafeERC20FailedOperation",
+    inputs: [
       {
-        "name": "token",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  }
-] as const
+        name: "token",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+  },
+] as const;
 
 export const CONTRACT_ADDRESSES = {
   ACCOUNT_FACTORY:
-    "0x06aedf4fF6F0D1c1dB641C62533D8B8fBE6ef6b4" as `0x${string}`, //base sepolia
-    FAUCET:"0x0770240697A3A9C3432Fd4eb8D856EB5C35b07ce" as `0x${string}`, // kairos faucet
+    "0x0B2514cfBF7D0972EAD457343C2F814EB5e35671" as `0x${string}`, //Account factory deployed baseSepolia
+  FAUCET: "0x0770240697A3A9C3432Fd4eb8D856EB5C35b07ce" as `0x${string}`, // kairos faucet deployed baseSepolia
+  ENTRYPOINT: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789" as `0x${string}`, // entry point on baseSepolia
 };
-

@@ -5,18 +5,14 @@ import { FcGoogle } from "react-icons/fc";
 import { SiGmail } from "react-icons/si";
 import { IoWallet } from "react-icons/io5";
 import { FaGithub } from "react-icons/fa";
-import SvgLoading from "../ui/svg-loading";
 import { usePrivy } from "@privy-io/react-auth";
+import LoginFormSkeleton from "./login-skeleton";
 export default function LoginForm() {
   const { ready } = usePrivy();
   const { login } = useLogin();
   if (!ready)
     return (
-      <div className='w-full flex justify-center items-center'>
-        <div className='max-w-xs'>
-          <SvgLoading />
-        </div>
-      </div>
+     <LoginFormSkeleton />
     );
   return (
     <div className={"flex flex-col gap-6"}>

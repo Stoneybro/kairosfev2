@@ -7,7 +7,20 @@ import { usePrivy } from "@privy-io/react-auth";
 function WalletFaucet({ smartAccount }: { smartAccount: `0x${string}` }) {
   const [funded, setFunded] = useState(false);
   const { authenticated } = usePrivy();
-  const faucetClaim = useFaucetClaim();
+  const faucetClaim=useFaucetClaim(smartAccount)
+  async function handleFaucetClaim() {
+    try {
+      const success = await faucetClaim(); // assuming it returns a boolean/hash
+      if (success) {
+        setFunded(true);
+        localStorage.setItem("faucetStatus", "true");
+      }
+      return true
+    } catch (e) {
+      console.error("Faucet claim failed", e);
+      return false
+    }
+  }
 
   useEffect(() => {
     const claimCheck = localStorage.getItem("faucetStatus");
@@ -35,21 +48,20 @@ function WalletFaucet({ smartAccount }: { smartAccount: `0x${string}` }) {
     }
   }, [smartAccount, authenticated]);
 
-
   if (!authenticated) {
-    return 
+    return;
   }
 
   return (
     <div>
       {!funded && (
         <LoadingButton
-          executeAction={faucetClaim}
-          idleText="click here to claim from faucet"
-          loadingText="claiming"
-          successText="claimed"
-          variant="ghost"
-          className="text-sm"
+          executeAction={handleFaucetClaim}
+          idleText='click here to claim from faucet'
+          loadingText='claiming'
+          successText='claimed'
+          variant='ghost'
+          className='text-sm'
         />
       )}
     </div>

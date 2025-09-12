@@ -18,6 +18,7 @@ export type activeTabType =
 
 export type TaskType = {
   id: bigint;
+  title: string;
   description: string;
   rewardAmount: bigint;
   deadline: bigint;
@@ -33,6 +34,7 @@ export type TaskTableData = {
   slug:string;
   id: bigint;
   title: string;
+  description: string;
   rewardAmount: string | bigint; 
   deadline: string | bigint; 
   status: number;

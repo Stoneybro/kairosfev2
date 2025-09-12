@@ -32,8 +32,8 @@ export function TaskTableWrapper({
   const limit = 7;
   const {
     data: taskCount,
-    isLoading:taskCountIsLoading,
-    error:taskCountError,
+    isLoading: taskCountIsLoading,
+    error: taskCountError,
   } = useQuery({
     queryKey: ["taskCount", smartAccount],
     queryFn: () => fetchTasksCount(smartAccount as `0x${string}`),
@@ -113,16 +113,16 @@ export function TaskTableWrapper({
     return <TableSkeleton error />;
   }
 
-  if (activeQuery.isLoading &&taskCountIsLoading) {
+  if (activeQuery.isLoading && taskCountIsLoading) {
     return <TableSkeleton />;
   }
 
-  if (activeQuery.error&&taskCountError) {
+  if (activeQuery.error && taskCountError) {
     return <TableSkeleton error />;
   }
 
   const task = activeQuery.data;
-  const statusCount = taskCount[TASK_STATUS_MAP[activeTab]];
+  const statusCount = taskCount?.[TASK_STATUS_MAP[activeTab]] ?? 0;
 
   return (
     <div className='flex flex-col gap-8'>
@@ -143,13 +143,14 @@ export function TaskTableWrapper({
           data={(task as TaskType[]).map((task) => ({
             slug: slugify(task.description) + "-" + task.id,
             id: task.id,
-            title: task.description,
+            title: task.title,
+            description: task.description,
             rewardAmount: `${formatNumber(task.rewardAmount)} ETH`,
             deadline: formatDate(task.deadline),
             status: task.status,
             choice: task.choice,
           }))}
-         page={page}
+          page={page}
           setPage={setPage}
           activeTab={activeTab}
           statusCount={statusCount}

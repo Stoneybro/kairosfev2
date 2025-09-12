@@ -2,7 +2,6 @@
 import { Cards } from "@/components/dashboard/cards/cards";
 import { TaskTableWrapper } from "@/components/dashboard/table/tableWrapper";
 import { cookies } from "next/headers";
-import SvgLoading from "@/components/ui/svg-loading";
 export async function getSmartAccountAddress() {
     const smartAccount = (await cookies()).get("smart_wallet")
     ?.value as `0x${string}`;

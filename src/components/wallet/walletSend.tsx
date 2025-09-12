@@ -1,57 +1,155 @@
-"use client"
-import { Loader2 } from "lucide-react";
-import { useState } from "react";
-import { Button } from "../ui/button";
+"use client";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useSend } from "@/hooks/useSend";
+import LoaderButton from "../ui/loaderButton";
+import { toast } from "sonner";
+import { formatEther, parseEther } from "viem";
+import { useQuery } from "@tanstack/react-query";
+import { fetchDashboardBalance } from "@/utils/helpers";
+import { useMemo } from "react";
+import { Input } from "../ui/input";
+import { Skeleton } from "../ui/skeleton";
 
-type SendType = "Send" | "Sending" | "Sent";
-export default function WalletSend () {
-  const [sendButton, setsendButton] = useState<SendType>("Send");
+function createSchema(availableBalance?: string) {
+  return z
+    .object({
+      address: z
+        .string()
+        .optional()
+        .refine((v) => {
+          if (!v) return true;
+          return /^0x[a-fA-F0-9]{40}$/.test(v);
+        }, "Invalid Ethereum address"),
+      amount: z
+        .string()
+        .regex(/^\d+(\.\d+)?$/, "Enter a valid number")
+        .refine((v) => Number(v) > 0, "amount must be > 0"),
+    })
+    .superRefine((vals, ctx) => {
+      // 1) amount <= available balance
+      if (vals.amount) {
+        try {
+          const amountWei = parseEther(vals.amount); // bigint
+          const availWei = availableBalance
+            ? parseEther(String(availableBalance))
+            : 0n;
+          if (amountWei > availWei) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: ["amount"],
+              message: "amount is greater than available balance",
+            });
+          }
+        } catch {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["amount"],
+            message: "Invalid amount value",
+          });
+        }
+      }
+    });
+}
 
+type SendValues = z.infer<ReturnType<typeof createSchema>>;
+export default function WalletSend({
+  smartAccount,
+}: {
+  smartAccount: `0x${string}`;
+}) {
+  const { data: cardData, isLoading: cardDataIsLoading } = useQuery({
+    queryKey: ["dashboardBalance", smartAccount],
+    queryFn: () => fetchDashboardBalance(smartAccount as `0x${string}`),
+    enabled: Boolean(smartAccount),
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity,
+  });
+
+  // build schema with the latest availableBalance
+  const schema = useMemo(
+    () => createSchema(cardData?.availableBalance),
+    [cardData?.availableBalance]
+  );
+  const send = useSend(smartAccount);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting, isValid },
+    reset,
+  } = useForm<SendValues>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      address: "",
+      amount: "0",
+    },
+  });
+  async function handleSend(values: SendValues) {
+    if (!isValid) return false;
+    const payload = {
+      address: values.address as `0x${string}`,
+      amount: parseEther(values.amount),
+    };
+    try {
+      await send.mutateAsync(payload);
+      toast.success(`${formatEther(payload.amount)} ETH sent successfully`);
+      reset();
+      return true;
+    } catch (error) {
+      console.log("sending failed",error);
+      toast.error("sending failed");
+      return false;
+    }
+  }
   return (
     <div className='px-4 flex flex-col w-full h-full gap-4 pt-8'>
-      <div className='flex flex-col gap-2 w-full'>
-        <div className='flex items-center justify-between'>
-          <label htmlFor='Addressto' className='text-muted-foreground text-sm'>
-            Send to
-          </label>
-          <Button variant={"outline"} className='text-xs px-2 py-1'>
-            YOUR WALLET
-          </Button>
-        </div>
-        <input
-          type='text'
-          name='Addressto'
-          className='border w-full p-2 rounded  '
-        />
+      {/* description */}
+      <div>
+        <label className='text-sm text-muted-foreground'>Address</label>
+        <Input {...register("address")} placeholder='' required />
+        {errors.address && (
+          <div className='text-sm mt-1 text-red-500'>
+            {errors.address.message}
+          </div>
+        )}
       </div>
-      <div className='flex flex-col gap-2 w-full'>
-        <label htmlFor='amount' className='text-muted-foreground text-sm'>
-          Amount
+
+      {/* amount */}
+      <div>
+        <label className='text-sm text-muted-foreground'>
+           Amount (ETH)
         </label>
-        <input
-          type='text'
-          placeholder='0'
-          name='amount'
-          className='border w-full p-2 rounded  '
-        />
-
-        <div className='text-muted-foreground self-end text-xs'>
-          Balance: 0.1 ETH
+        <Input {...register("amount")} placeholder='0.00' inputMode='decimal' />
+        <div className='text-muted-foreground text-xs text-end mt-1'>
+          balance:
+          {cardDataIsLoading ? (
+            <Skeleton className='h-2 w-4' />
+          ) : (
+            cardData?.availableBalance
+          )}
+          ETH
         </div>
+        {errors.amount && (
+          <div className='text-sm text-red-500'>{errors.amount.message}</div>
+        )}
       </div>
-      <Button
-        variant={"outline"}
-        disabled
-        className={`
-         `}
-      >
-
-          <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-
-        {sendButton}
-      </Button>
+      <LoaderButton
+        className='w-full'
+        idleText='send'
+        loadingText='sending...'
+        successText='sent!'
+        disabled={isSubmitting}
+        timeoutMs={60000}
+        executeAction={async () => {
+          let success = false;
+          await handleSubmit(async (values) => {
+            success = await handleSend(values);
+          })();
+          return success;
+        }}
+      />
     </div>
   );
-};
-
-
+}

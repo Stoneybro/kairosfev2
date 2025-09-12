@@ -37,7 +37,7 @@ export function WalletSidebar({ smartAccount, ...props }: WalletSidebarProps) {
               />
             )}
             {activeTab === "receive" && <WalletRecieve />}
-            {activeTab === "send" && <WalletSend />}
+            {activeTab === "send" && <WalletSend smartAccount={smartAccount} />}
             {activeTab === "activity" && <WalletActivity />}
             {activeTab === "settings" && <WalletSettings />}
             {activeTab === "deposit" && <WalletDeposit />}

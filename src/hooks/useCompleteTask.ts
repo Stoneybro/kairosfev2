@@ -6,7 +6,7 @@ import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
 
 
 
-export function useCompleteTask(smartAccount: `0x${string}`) {
+export function useCompleteTask(smartAccount: `0x${string}`,id:string) {
   const { initClient } = useSmartAccount();
   const qc = useQueryClient();
 
@@ -38,7 +38,8 @@ export function useCompleteTask(smartAccount: `0x${string}`) {
       qc.invalidateQueries({ queryKey: ["tasks", smartAccount] });
       qc.invalidateQueries({ queryKey: ["dashboardBalance", smartAccount] });
       qc.invalidateQueries({ queryKey: ["taskCount",smartAccount] });
-      
+      qc.invalidateQueries({ queryKey: ["taskById", smartAccount,id] });
+
     },
     onError: (err, payLoad, context: any) => {
       console.log(err);

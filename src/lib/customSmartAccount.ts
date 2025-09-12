@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { toSmartAccount } from "viem/account-abstraction";
-import { encodeFunctionData, hashMessage, toHex } from "viem";
-import {
-  SMART_ACCOUNT_ABI,
-  ACCOUNT_FACTORY_ABI,
-  ENTRYPOINT_ABI,
-} from "./contracts/contracts";
+import { encodeFunctionData } from "viem";
+import { ACCOUNT_FACTORY_ABI, ENTRYPOINT_ABI } from "./contracts/contracts";
 import {
   useWallets,
   useSignMessage,
@@ -80,8 +76,7 @@ export default function useCustomSmartAccount() {
           if (calls.length !== 1)
             throw new Error("minimal adapter supports 1 call");
           const [c] = calls;
-            return c.data ?? "0x"; // <-- direct call
-          
+          return c.data ?? "0x"; // <-- direct call
         },
         async getAddress() {
           return predictAddress(
