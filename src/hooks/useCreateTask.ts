@@ -18,7 +18,6 @@ type CreateTaskArgsType = {
 export function useCreateTask(smartAccount: `0x${string}`) {
   const { initClient } = useSmartAccount();
   const qc = useQueryClient();
-
   return useMutation({
     mutationFn: async (payLoad: CreateTaskArgsType) => {
       const client = await initClient();

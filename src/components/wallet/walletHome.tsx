@@ -59,6 +59,7 @@ export default function WalletHome({ setActiveTab,smartAccount }: WalletHomeProp
             onClick={() => setActiveTab("deposit")}
             variant={"outline"}
             className='w-full'
+            id="tour-deposit-btn"
           >
             <CiMoneyCheck1 />
             <span className=' font-medium'>Deposit</span>
@@ -68,6 +69,7 @@ export default function WalletHome({ setActiveTab,smartAccount }: WalletHomeProp
             onClick={() => setActiveTab("send")}
             variant={"outline"}
             className='w-full'
+            id="tour-send-btn"
           >
             <ArrowUpDown />
             <span className=' font-medium'>Send</span>

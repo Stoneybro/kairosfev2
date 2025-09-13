@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { WalletSidebar } from "@/components/wallet/walletSidebar";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { getSmartAccountAddress } from "./page";
+import IntroTour from "@/components/driver.js/tour";
 
 export default async function Dashboard({
   children,
@@ -31,6 +32,7 @@ const smartAccount= await getSmartAccountAddress()
         </div>
       </SidebarInset>
       <WalletSidebar variant='inset' side='right' smartAccount={smartAccount}  />
+      <IntroTour />
     </SidebarProvider>
   );
 }

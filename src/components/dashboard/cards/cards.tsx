@@ -36,7 +36,7 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
   }
   return (
     <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4  *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs  @xl/main:grid-cols-2 @5xl/main:grid-cols-4'>
-      <Card className='@container/card'>
+      <Card className='@container/card' id="tour-balance-card">
         <CardHeader>
           <CardDescription>Available Balance</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
@@ -53,7 +53,7 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
         </CardFooter>
       </Card>
 
-      <Card className='@container/card'>
+      <Card className='@container/card' id="tour-active-tasks-card">
         <CardHeader>
           <CardDescription>Active Tasks</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
@@ -69,7 +69,7 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
           </div>
         </CardFooter>
       </Card>
-      <Card className='@container/card'>
+      <Card className='@container/card' id="tour-committed-funds-card">
         <CardHeader>
           <CardDescription>Commited Funds</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
@@ -85,7 +85,7 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
           </div>
         </CardFooter>
       </Card>
-      <Card className='@container/card'>
+      <Card className='@container/card' id="tour-performance-card">
         <CardHeader>
           <CardDescription>Task Performance</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>

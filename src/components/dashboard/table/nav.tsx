@@ -33,8 +33,9 @@ const{data,isLoading,error}=useQuery({
       value={activeTab}
       onValueChange={(value) => setActiveTab(value as TableNavType["activeTab"])}
       className='w-full flex flex-col gap-8 '
+
     >
-      <div className='flex items-center justify-between  bg-muted/20'>
+      <div className='flex items-center justify-between  bg-muted/20'  id="tour-task-tabs">
         <label htmlFor='view-selector' className='sr-only'>
           View
         </label>

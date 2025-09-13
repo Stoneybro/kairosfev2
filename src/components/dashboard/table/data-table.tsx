@@ -78,8 +78,8 @@ export function DataTable<TValue>({
 
   return (
     <>
-      <div className={`w-full  border rounded`}>
-        <Table>
+      <div className={`w-full  border rounded`} >
+        <Table id="tour-task-table">
           <TableHeader className='bg-muted'>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

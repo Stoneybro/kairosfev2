@@ -20,7 +20,7 @@ export function WalletSidebar({ smartAccount, ...props }: WalletSidebarProps) {
   const [activeTab, setActiveTab] = useState<activeTabType>("home");
 
   return (
-    <Sidebar collapsible='offcanvas' {...props}>
+    <Sidebar collapsible='offcanvas' {...props} id="tour-wallet-sidebar">
       <div className='bg-background mx-auto my-auto h-[95vh] w-[95%] max-w-3xl rounded-xl  shadow'>
         <div className='w-full h-[10%]  '>
           <WalletHeader
@@ -42,7 +42,7 @@ export function WalletSidebar({ smartAccount, ...props }: WalletSidebarProps) {
             {activeTab === "settings" && <WalletSettings />}
             {activeTab === "deposit" && <WalletDeposit />}
           </div>
-          <div className='text-sm text-gray-400 self-center absolute bottom-10'>
+          <div className='text-sm text-gray-400 self-center absolute bottom-10' id="tour-claim-faucet">
             <WalletFaucet smartAccount={smartAccount} />
           </div>
         </div>
