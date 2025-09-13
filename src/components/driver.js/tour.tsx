@@ -100,6 +100,15 @@ function initTour() {
           },
         },
         {
+          element: TOUR_TARGETS.RECEIVE_BTN,
+          popover: {
+            title: "receive",
+            description:
+              "Receive funds funds using the qrcode or the address",
+            side: "top",
+          },
+        },
+        {
           element: TOUR_TARGETS.SEND_BTN,
           popover: {
             title: "Send",

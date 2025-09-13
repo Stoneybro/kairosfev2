@@ -50,6 +50,7 @@ export default function WalletHome({ setActiveTab,smartAccount }: WalletHomeProp
           variant={"outline"}
           onClick={() => setActiveTab("receive")}
           className='w-full '
+          id="tour-receive-btn"
         >
           <QrCode />
           <span className=' font-medium'>receive</span>

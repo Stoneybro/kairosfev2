@@ -10,5 +10,6 @@ export const TOUR_TARGETS = {
   WALLET_SIDEBAR: "#tour-wallet-sidebar",
   CLAIM_FAUCET: "#tour-claim-faucet",
   SEND_BTN: "#tour-send-btn",
+  RECEIVE_BTN: "#tour-receive-btn",
   DEPOSIT_BTN: "#tour-deposit-btn",
 };
