@@ -2,7 +2,7 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import { usePrivyAccount } from "./usePrivyAccount";
-import { getBalanceServer } from "../server";
+import { getBalance } from "./server";
 
 export function useBalance(addr?: `0x${string}`) {
   const { address, chainId } = usePrivyAccount();
@@ -11,7 +11,7 @@ export function useBalance(addr?: `0x${string}`) {
   return useQuery({
     queryKey: ["balance", cid, a],
     enabled: !!a && !!cid,
-    queryFn: () => getBalanceServer({ address: a }),
+    queryFn: () => getBalance({ address: a }),
     refetchInterval: 15_000,
   });
 }

@@ -39,7 +39,7 @@ export async function getBlockNumberServer() {
  * Useful server-side to estimate gas, validate args, or prepare payload.
  * Note: sending a state-changing tx server-side requires a signer or a signed tx.
  */
-export async function simulateContractServer(params: {
+export async function simulateContract(params: {
   address: `0x${string}`;
   abi: Abi;
   functionName: string;
@@ -58,7 +58,7 @@ export async function simulateContractServer(params: {
 /**
  * Wait for a transaction receipt. Safe on server.
  */
-export async function waitForTransactionReceiptServer(params: {
+export async function waitForTransactionReceipt(params: {
   chainId: number;
   hash: `0x${string}`;
   confirmations?: number;
@@ -75,7 +75,7 @@ export async function waitForTransactionReceiptServer(params: {
  * Server-side event watcher. Returns unsubscribe function.
  * Use only in long-running server processes (workers) or for on-demand short watchers.
  */
-export function watchContractEventServer(params: {
+export function watchContractEvent(params: {
   chainId: number;
   address: `0x${string}`;
   abi: Abi;
