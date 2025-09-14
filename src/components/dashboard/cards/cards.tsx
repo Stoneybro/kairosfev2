@@ -16,27 +16,37 @@ import { CardsSkeleton } from "./cardsSkeleton";
 import { fetchTasksCount } from "@/utils/helpers";
 import { fetchDashboardBalance } from "@/utils/helpers";
 
-
 export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
-  const { data:cardData, isLoading:cardDataIsLoading } = useQuery({
+  const { data: cardData, isLoading: cardDataIsLoading } = useQuery({
     queryKey: ["dashboardBalance", smartAccount],
     queryFn: () => fetchDashboardBalance(smartAccount),
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     staleTime: Infinity,
   });
-  const{data:taskCount,isLoading:taskCountLoading,error}=useQuery({
-    queryKey:["taskCount",smartAccount],
-    queryFn:()=>fetchTasksCount(smartAccount),
-    staleTime:Infinity
-  })
+  const {
+    data: taskCount,
+    isLoading: taskCountLoading,
+    error,
+  } = useQuery({
+    queryKey: ["taskCount", smartAccount],
+    queryFn: () => fetchTasksCount(smartAccount),
+    staleTime: Infinity,
+  });
 
   if (cardDataIsLoading && taskCountLoading) {
     return <CardsSkeleton />;
   }
+  const total = taskCount?.reduce((a: number, b: number) => a + b, 0) ?? 0;
+  let performance = 0;
+  if (total > 0) {
+    const raw = (taskCount[0] / total) * 100;
+    performance = parseFloat(raw.toFixed(2));
+  }
+
   return (
     <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4  *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs  @xl/main:grid-cols-2 @5xl/main:grid-cols-4'>
-      <Card className='@container/card' id="tour-balance-card">
+      <Card className='@container/card' id='tour-balance-card'>
         <CardHeader>
           <CardDescription>Available Balance</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
@@ -53,11 +63,11 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
         </CardFooter>
       </Card>
 
-      <Card className='@container/card' id="tour-active-tasks-card">
+      <Card className='@container/card' id='tour-active-tasks-card'>
         <CardHeader>
           <CardDescription>Active Tasks</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-            {taskCountLoading?"0":taskCount[0]}
+            {taskCountLoading ? "0" : taskCount[0]}
           </CardTitle>
           <CardAction>
             <IoIosListBox size={35} />
@@ -69,7 +79,7 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
           </div>
         </CardFooter>
       </Card>
-      <Card className='@container/card' id="tour-committed-funds-card">
+      <Card className='@container/card' id='tour-committed-funds-card'>
         <CardHeader>
           <CardDescription>Commited Funds</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
@@ -85,11 +95,11 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
           </div>
         </CardFooter>
       </Card>
-      <Card className='@container/card' id="tour-performance-card">
+      <Card className='@container/card' id='tour-performance-card'>
         <CardHeader>
           <CardDescription>Task Performance</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-            44.4%
+            {performance}%
           </CardTitle>
           <CardAction>
             <BiBullseye size={35} />

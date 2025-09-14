@@ -18,7 +18,7 @@ export default function LoginPage() {
         <div className='flex justify-center gap-2 md:justify-start'>
           <Link href='/' className='flex items-center gap-2 font-medium'>
             <Image
-              src={"/kairoslogo.svg"}
+              src={"/kairoslogo-light.svg"}
               width={120}
               height={100}
               alt='kairos logo'

@@ -9,10 +9,10 @@ export const privyConfig: PrivyClientConfig = {
   },
   defaultChain:baseSepolia,
   supportedChains: [baseSepolia],
-  loginMethods: ["wallet", "email", "google","github"],
+  loginMethods: [ "email", "google","github"],
   appearance: {
     accentColor: "#38CCCD",
-    theme: "light",
+    theme: "dark",
     landingHeader: "Kairos",
     walletChainType: "ethereum-only",
     walletList: ["detected_wallets"],

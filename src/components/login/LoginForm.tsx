@@ -10,10 +10,7 @@ import LoginFormSkeleton from "./login-skeleton";
 export default function LoginForm() {
   const { ready } = usePrivy();
   const { login } = useLogin();
-  if (!ready)
-    return (
-     <LoginFormSkeleton />
-    );
+  if (!ready) return <LoginFormSkeleton />;
   return (
     <div className={"flex flex-col gap-6"}>
       <div className='flex flex-col items-center gap-2 text-center'>
@@ -31,14 +28,7 @@ export default function LoginForm() {
           <FcGoogle />
           Login with Google
         </Button>
-        <Button
-          onClick={() => login({ loginMethods: ["email"] })}
-          variant='outline'
-          className='w-full'
-        >
-          <SiGmail />
-          Login with Email
-        </Button>
+
         <Button
           onClick={() => login({ loginMethods: ["github"] })}
           variant='outline'
@@ -53,12 +43,12 @@ export default function LoginForm() {
           </span>
         </div>
         <Button
-          onClick={() => login({ loginMethods: ["wallet"] })}
+          onClick={() => login({ loginMethods: ["email"] })}
           variant='outline'
           className='w-full'
         >
-          <IoWallet />
-          Connect Wallet
+          <SiGmail />
+           Email
         </Button>
       </div>
     </div>

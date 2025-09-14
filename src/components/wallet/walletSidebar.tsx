@@ -40,7 +40,6 @@ export function WalletSidebar({ smartAccount, ...props }: WalletSidebarProps) {
             {activeTab === "send" && <WalletSend smartAccount={smartAccount} />}
             {activeTab === "activity" && <WalletActivity />}
             {activeTab === "settings" && <WalletSettings />}
-            {activeTab === "deposit" && <WalletDeposit />}
           </div>
           <div className='text-sm text-gray-400 self-center absolute bottom-10' id="tour-claim-faucet">
             <WalletFaucet smartAccount={smartAccount} />
