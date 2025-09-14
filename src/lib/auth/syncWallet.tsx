@@ -4,8 +4,7 @@ import { useEffect } from "react";
 import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import SvgLoading from "../../components/ui/svg-loading";
-
+import SvgLoading from "../../components/ui/spinner";
 
 async function doFetch(
   body: { walletAddress: string },
@@ -44,18 +43,16 @@ async function syncWalletOnServer(walletAddr: string, signal?: AbortSignal) {
   return res.json();
 }
 
-
 export default function SyncWalletAfterLogin() {
   const { ready, user, authenticated, login } = usePrivy();
   const router = useRouter();
   const queryClient = useQueryClient();
   const wallet = user?.wallet?.address;
 
-
   const query = useQuery({
     queryKey: ["sync-session", wallet],
     queryFn: ({ signal }) => syncWalletOnServer(wallet as string, signal),
-    enabled: Boolean(ready && authenticated && wallet ),
+    enabled: Boolean(ready && authenticated && wallet),
     refetchOnWindowFocus: false,
     refetchInterval: 4 * 60 * 1000,
     refetchOnReconnect: false,
@@ -90,7 +87,6 @@ export default function SyncWalletAfterLogin() {
     return () => window.removeEventListener("online", onOnline);
   }, [queryClient, wallet]);
 
-  
   useEffect(() => {
     if (!query.isFetched) return;
     (async () => {
@@ -112,7 +108,6 @@ export default function SyncWalletAfterLogin() {
       else router.replace("/login");
     })();
   }, [query.isFetched, query.isError, query.data, router]);
-
 
   return null;
 }

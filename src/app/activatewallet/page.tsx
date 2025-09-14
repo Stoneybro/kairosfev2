@@ -5,12 +5,12 @@ import { activateWallet } from "@/hooks/useActivateWallet";
 import { Label } from "@radix-ui/react-label";
 import { Checkbox } from "@/components/ui/checkbox";
 import LoadingButton from "@/components/ui/loaderButton";
-import SvgLoading from "@/components/ui/svg-loading";
+import SvgLoading from "@/components/ui/spinner";
 import SyncWalletAfterLogin from "@/lib/auth/syncWallet";
 import { usePrivy } from "@privy-io/react-auth";
 function page() {
   const [checked, setChecked] = useState(false);
-  const handleActivateWallet= activateWallet();
+  const handleActivateWallet = activateWallet();
   const { ready, authenticated, user } = usePrivy();
   if (!ready || !authenticated || !user) {
     return (

@@ -4,16 +4,16 @@ import Link from "next/link";
 import LoginForm from "@/components/login/LoginForm";
 import SyncWalletAfterLogin from "@/lib/auth/syncWallet";
 import { usePrivy } from "@privy-io/react-auth";
-import SvgLoading from "@/components/ui/svg-loading";
+import Spinner from "@/components/ui/spinner"
 export default function LoginPage() {
   const { authenticated } = usePrivy();
   return (
     <div className='grid min-h-svh lg:grid-cols-2 relative'>
       {authenticated && (
         <div className='absolute top-0 left-0 bg-background w-full h-full z-50 flex justify-center items-center'>
-          <SvgLoading />
+          <Spinner w={175} h={175} rotate={true} />
         </div>
-      )}{" "}
+      )}
       <div className='flex flex-col gap-4 p-4 md:p-8'>
         <div className='flex justify-center gap-2 md:justify-start'>
           <Link href='/' className='flex items-center gap-2 font-medium'>

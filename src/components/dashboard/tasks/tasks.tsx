@@ -9,6 +9,7 @@ import { IoCalendarOutline } from "react-icons/io5";
 import { PiClockClockwiseLight } from "react-icons/pi";
 import { BsSignpostSplit } from "react-icons/bs";
 import { LuScanQrCode } from "react-icons/lu";
+import { MdOutlineDescription } from "react-icons/md";
 import Taskskeleton from "./task-skeleton";
 import {
   fetchTasksById,
@@ -24,7 +25,6 @@ import { toast } from "sonner";
 import { useCancelTask } from "@/hooks/useCancelTask";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { BookOpenText, TableRowsSplit } from "lucide-react";
 
 function Tasks({
   slug,
@@ -98,12 +98,12 @@ function Tasks({
   }
 
   return (
-    <div className='flex flex-col gap-6'>
+    <div className='flex flex-col gap-6 h-full'>
       <div className='text-2xl'>{taskData.title}</div>
       <div className='flex flex-col justify-start items-start max-w-sm gap-4'>
         <div className='flex justify-between items-center w-full'>
           <span className='text-muted-foreground flex items-center gap-1'>
-            <BookOpenText /> description
+            <MdOutlineDescription /> description
           </span>
           <span className=" text-xs">{taskData.description}</span>
         </div>
