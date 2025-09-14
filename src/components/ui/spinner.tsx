@@ -2,9 +2,9 @@
 import React from "react";
 
 export default function Spinner({
-  w,
-  h,
-  rotate,
+  w=175,
+  h=175,
+  rotate=true,
 }: {
   w: number;
   h: number;

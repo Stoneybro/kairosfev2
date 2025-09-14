@@ -5,9 +5,9 @@ import { activateWallet } from "@/hooks/useActivateWallet";
 import { Label } from "@radix-ui/react-label";
 import { Checkbox } from "@/components/ui/checkbox";
 import LoadingButton from "@/components/ui/loaderButton";
-import SvgLoading from "@/components/ui/spinner";
 import SyncWalletAfterLogin from "@/lib/auth/syncWallet";
 import { usePrivy } from "@privy-io/react-auth";
+import Spinner from "@/components/ui/spinner";
 function page() {
   const [checked, setChecked] = useState(false);
   const handleActivateWallet = activateWallet();
@@ -16,7 +16,7 @@ function page() {
     return (
       <div className='w-full h-screen flex justify-center items-center'>
         <div className='w-32 h-32'>
-          <SvgLoading />
+          <Spinner h={175} w={175} rotate={true} />
         </div>
       </div>
     );
