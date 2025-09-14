@@ -15,10 +15,10 @@ export function DashboardHeader() {
       <div className='flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6'>
         <Link href={"/"}>
           <Image
-            src={"/kairoslogo.svg"}
+            src={"/kairoslogo-light.svg"}
             alt='kairos logo'
-            width={120}
-            height={120}
+            width={100}
+            height={100}
             className='dark:hidden'
           />
           <Image
