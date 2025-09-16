@@ -1,5 +1,4 @@
 "use client";
-import { useSmartAccount } from "@/lib/useSmartAccount";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { encodeFunctionData } from "viem";
 import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
