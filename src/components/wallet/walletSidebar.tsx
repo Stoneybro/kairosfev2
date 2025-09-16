@@ -7,7 +7,6 @@ import WalletFooter from "./walletFooter";
 import { activeTabType } from "@/types";
 import WalletRecieve from "./walletReceive";
 import WalletSend from "./walletSend";
-import WalletActivity from "./walletActivity";
 import WalletSettings from "./walletSettings";
 import Activity from "./walletActivity/activity";
 import WalletFaucet from "./walletFaucet";
