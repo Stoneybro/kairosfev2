@@ -6,8 +6,8 @@ import { Button } from "../ui/button";
 import { activeTabType } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDashboardBalance } from "@/utils/helpers";
-import WalletSkeleton from "./walletSkeleton";
 import { Skeleton } from "../ui/skeleton";
+
 type WalletHomeProps = {
   setActiveTab: (tab: activeTabType) => void;
   smartAccount: `0x${string}`;

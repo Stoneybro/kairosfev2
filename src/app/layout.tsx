@@ -59,7 +59,6 @@ export const metadata: Metadata = {
     icon:["/favicon.ico"],
     apple:["/apple-icon.png"]
   },
-  themeColor:"#1f2937",
   metadataBase:new URL("https://www.usekairos.xyz/")
 };
 

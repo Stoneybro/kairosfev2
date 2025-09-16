@@ -4,6 +4,7 @@ import {
   KAIROSFAUCET_ABI,
   SMART_ACCOUNT_ABI,
 } from "@/lib/contracts/contracts";
+import { Tx } from "@/types";
 import { formatEther } from "viem";
 
 export function toSerializable(obj: any): any {
@@ -37,6 +38,21 @@ export function formatDate(date: bigint) {
     minute: "2-digit",
   });
 }
+const toMillis = (v: number | string | bigint | undefined) => {
+  if (v === undefined || v === null) return 0;
+  const n = typeof v === "bigint" ? Number(v) : Number(v);
+  // if already ms ( > 1e12 ) treat as ms, otherwise seconds -> ms
+  return n > 1e12 ? n : n * 1000;
+};
+export function getTimeRemaining(deadline: number | string | bigint | undefined,delay: number | string | bigint | undefined) {
+  const deadlineMs = toMillis(deadline);
+  const delayMs = toMillis(delay);
+  const end = deadlineMs + delayMs;
+  const now = Date.now();
+  const remaining = end - now;
+  const timeRemaining=formatTime(Math.floor(remaining / 1000));
+  return remaining > 0 ? timeRemaining : "Withdrawable";
+}
 export function slugify(str: string) {
   return str
     .toLowerCase()
@@ -67,7 +83,79 @@ export function formatTime(seconds: number): string {
   return parts.join(" ") || "0 min";
 }
 
+const BLOCKSCOUT_BASE = "https://base-sepolia.blockscout.com/api";
 
+export async function fetchWalletActivity({
+  pageParam = 1,
+  smartAccount,
+}: {
+  pageParam?: number;
+  smartAccount: `0x${string}`;
+}) {
+
+    const url = new URL(BLOCKSCOUT_BASE);
+    url.searchParams.set("module", "account");
+    url.searchParams.set("action", "txlistinternal");
+    url.searchParams.set("address", smartAccount);
+    url.searchParams.set("page", String(pageParam));
+    url.searchParams.set("offset", "15");
+    url.searchParams.set("sort", "desc");
+    url.searchParams.set("apikey", process.env.NEXT_PUBLIC_BASESCOUT_API_KEY!);
+
+    const res = await fetch(url.toString());
+    if (!res.ok) {
+      throw new Error(
+        `Error fetching activity: ${res.status} ${res.statusText}`
+      );
+    }
+
+    const data = await res.json();
+    if (data.status !== "1" && data.message !== "OK") {
+      if (data.message === "No transactions found") {
+        return [];
+      }
+      return [];
+    }
+    console.log(Array.isArray(data.result) ? data.result : []);
+
+    return Array.isArray(data.result) ? data.result : [];
+  };
+
+export function getTransactionType(
+  tx: Tx,
+  smartAccount: string
+): {
+  type: "Sent" | "Received" | "Deploy Contract" | "Recurring Buy";
+  isIncoming: boolean;
+} {
+  const smartAccountLower = smartAccount.toLowerCase();
+  const isIncoming = tx.to && tx.to.toLowerCase() === smartAccountLower;
+  const isOutgoing = tx.from && tx.from.toLowerCase() === smartAccountLower;
+
+  // Contract deployment
+  if (!tx.to || tx.to === "0x0000000000000000000000000000000000000000") {
+    return { type: "Deploy Contract", isIncoming: false };
+  }
+
+  // Contract interaction with ETH value (like DEX swaps)
+  if (tx.input && tx.input !== "0x" && tx.value !== "0") {
+    return { type: "Recurring Buy", isIncoming: false };
+  }
+
+  // For AA wallets, we need to be more careful about determining direction
+  // Internal transactions might have different patterns
+  if (isIncoming) {
+    return { type: "Received", isIncoming: true };
+  } else if (isOutgoing) {
+    return { type: "Sent", isIncoming: false };
+  } else {
+    // For internal transactions, check if value is going to the smart account
+    return {
+      type: tx.value !== "0" ? "Received" : "Sent",
+      isIncoming: tx.value !== "0",
+    };
+  }
+}
 
 export async function fetchDashboardBalance(
   smartAccountAddress: `0x${string}`

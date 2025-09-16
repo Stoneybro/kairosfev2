@@ -6,7 +6,6 @@ async function page() {
   return (
     <div>
         <CreateTaskForm smartAccount={smartAccount} />
-      
     </div>
   )
 }

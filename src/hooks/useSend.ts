@@ -3,19 +3,19 @@ import { useSmartAccount } from "@/lib/useSmartAccount";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { encodeFunctionData } from "viem";
 import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
-
+import { useSmartAccountContext } from "@/lib/smartAccountProvider";
 type SendArgsType = {
   address:`0x${string}`;
   amount: bigint;
 };
 
 export function useSend(smartAccount: `0x${string}`) {
-  const { initClient } = useSmartAccount();
+  const { getClient } = useSmartAccountContext();
   const qc = useQueryClient();
 
   return useMutation({
     mutationFn: async (payLoad: SendArgsType) => {
-      const client = await initClient();
+      const client = await getClient();
       if (!client) throw new Error("Smart account not initialized");
       const callData = encodeFunctionData({
         abi: SMART_ACCOUNT_ABI,

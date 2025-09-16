@@ -14,7 +14,7 @@ export async function verifyAuth(request: NextRequest) {
     request.cookies.get("user_wallet_activated")?.value === "1";
 
   if (!session) {
-    // allow a controlled grace if client still has wallet cookie. client will attempt immediate refresh.
+    
     if (wallet)
       return {
         isAuthenticated: false,

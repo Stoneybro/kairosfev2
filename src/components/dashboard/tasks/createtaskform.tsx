@@ -263,7 +263,7 @@ export default function CreateTaskForm({
             placeholder='0.00'
             inputMode='decimal'
           />
-          <div className='text-muted-foreground text-xs text-end mt-1'>
+          <div className='text-muted-foreground bg-background text-xs text-end mt-1'>
             balance:
             {cardDataIsLoading ? (
               <Skeleton className='h-2 w-4' />

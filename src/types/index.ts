@@ -15,6 +15,17 @@ export type activeTabType =
   | "deposit"
   | "send";
 
+export type Tx = {
+  transactionHash: string;
+  from: string;
+  to: string;
+  value: string;
+  timeStamp: string;
+  input?: string;
+  isError?: string;
+  gasUsed?: string;
+  gasPrice?: string;
+};
 
 export type TaskType = {
   id: bigint;
@@ -26,7 +37,7 @@ export type TaskType = {
   status: number;
   choice: number;
   delayDuration: bigint;
-  buddyAddress?: `0x${string}` | undefined;
+  buddy?: `0x${string}` | undefined;
   delayedRewardReleased: boolean;
   verificationMethod: number;
 };

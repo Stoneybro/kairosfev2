@@ -4,19 +4,22 @@ import { useQuery } from "@tanstack/react-query";
 import { PENALTY_ENUM, TaskStatus, TaskType, VERIFICATION_ENUM } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { PiSpinner } from "react-icons/pi";
-import { BiCoinStack } from "react-icons/bi";
+import { BiCaretLeft, BiCoinStack } from "react-icons/bi";
 import { IoCalendarOutline } from "react-icons/io5";
 import { PiClockClockwiseLight } from "react-icons/pi";
 import { BsSignpostSplit } from "react-icons/bs";
 import { LuScanQrCode } from "react-icons/lu";
 import { MdOutlineDescription } from "react-icons/md";
+import { SiStagetimer } from "react-icons/si";
 import Taskskeleton from "./task-skeleton";
 import {
   fetchTasksById,
   formatDate,
   formatNumber,
   formatTime,
+  getTimeRemaining,
   parseSlug,
+  truncateAddress,
 } from "@/utils/helpers";
 
 import LoaderButton from "@/components/ui/loaderButton";
@@ -25,6 +28,9 @@ import { toast } from "sonner";
 import { useCancelTask } from "@/hooks/useCancelTask";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
+import CopyText from "@/components/ui/copy";
+import { useReleaseDelayedPayment } from "@/hooks/useReleaseDelayedPayment";
+import Link from "next/link";
 
 function Tasks({
   slug,
@@ -51,6 +57,7 @@ function Tasks({
   });
   const completeTask = useCompleteTask(smartAccount, parsed?.id);
   const cancelTask = useCancelTask(smartAccount, parsed?.id);
+  const releaseFunds = useReleaseDelayedPayment(smartAccount, parsed?.id);
   if (isLoading)
     return (
       <div>
@@ -69,7 +76,7 @@ function Tasks({
         No task found
       </div>
     );
-
+    const timeRemaining=getTimeRemaining(taskData.deadline,taskData.delayDuration)
   async function handleComplete(id: string): Promise<boolean> {
     const payLoad = BigInt(id);
     try {
@@ -96,16 +103,31 @@ function Tasks({
       return false;
     }
   }
+  async function handleRelease(id: string) {
+    const payLoad = BigInt(id);
+    try {
+      await releaseFunds.mutateAsync(payLoad);
+      toast.success("Funds Released Successfully");
+      router.push("/dashboard");
+      return true;
+    } catch (error) {
+      console.log("Error releasing Funds:", error);
+      toast.error("Funds Release Failed");
+      return false;
+    }
+  }
 
   return (
-    <div className='flex flex-col gap-6 h-full'>
+    <div>
+    <Link href={"/dashboard"} className="text-xs text-muted-foreground flex items-center mb-2"><BiCaretLeft /> back to Dashboard</Link>
+      <div className='flex flex-col gap-6 h-full'>
       <div className='text-2xl'>{taskData.title}</div>
       <div className='flex flex-col justify-start items-start max-w-sm gap-4'>
         <div className='flex justify-between items-center w-full'>
           <span className='text-muted-foreground flex items-center gap-1'>
             <MdOutlineDescription /> description
           </span>
-          <span className=" text-xs">{taskData.description}</span>
+          <span className=' text-xs'>{taskData.description}</span>
         </div>
         <div className='flex justify-between items-center w-full'>
           <span className='text-muted-foreground flex items-center gap-1'>
@@ -133,11 +155,19 @@ function Tasks({
         </div>
         {taskData.choice == 1 &&
           (taskData.status == 0 || taskData.status == 3) && (
+            <div className="flex flex-col gap-4 w-full">
             <div className='flex justify-between items-center w-full'>
               <span className='text-muted-foreground flex items-center gap-1'>
                 <PiClockClockwiseLight /> Delay duration
               </span>
               <span>{formatTime(Number(taskData.delayDuration))}</span>
+            </div>
+            <div className='flex justify-between items-center w-full'>
+              <span className='text-muted-foreground flex items-center gap-1'>
+                <SiStagetimer /> time remaining
+              </span>
+              <span>{timeRemaining}</span>
+            </div>
             </div>
           )}
         {taskData.choice == 2 &&
@@ -146,7 +176,10 @@ function Tasks({
               <span className='text-muted-foreground flex items-center gap-1'>
                 <PiClockClockwiseLight /> partner address
               </span>
-              <span>{taskData.buddyAddress}</span>
+              <span>
+                {truncateAddress(taskData.buddy as string)}{" "}
+                <CopyText text={taskData.buddy as string} />
+              </span>
             </div>
           )}
 
@@ -178,7 +211,22 @@ function Tasks({
           />
         </div>
       )}
-    </div>
+      {taskData.status == 3 &&
+        !taskData.delayedRewardReleased &&
+        taskData.choice == 1 && (
+          <div className='flex justify-start gap-4 items-center max-w-sm'>
+            <LoaderButton
+              className=''
+              idleText='Release Funds'
+              loadingText='Releasing Funds...'
+              successText='Funds Released!'
+              timeoutMs={60000}
+              executeAction={() => handleRelease(taskData.id.toString())}
+            />
+          </div>
+        )}
+    </div></div>
+
   );
 }
 

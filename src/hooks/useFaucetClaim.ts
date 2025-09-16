@@ -1,18 +1,17 @@
 "use client";
-import { useSmartAccount } from "@/lib/useSmartAccount";
 import { useQueryClient } from "@tanstack/react-query";
 import { encodeFunctionData } from "viem";
 import { CONTRACT_ADDRESSES, KAIROSFAUCET_ABI, SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
+import { useSmartAccountContext } from "@/lib/smartAccountProvider";
 import { toast } from "sonner";
 
 export default function useFaucetClaim(smartAccount: `0x${string}`) {
   const qc = useQueryClient();
-  const { initClient } = useSmartAccount();
-
+  const { getClient } = useSmartAccountContext();
 
   async function faucetClaim() {
     try {
-      const smartAccountClient = await initClient();
+      const smartAccountClient = await getClient();
       if (!smartAccountClient) {
         throw new Error("Smart Account Client is not initialized");
       }
@@ -40,6 +39,7 @@ export default function useFaucetClaim(smartAccount: `0x${string}`) {
        qc.invalidateQueries({ queryKey: ["tasks", smartAccount] });
       qc.invalidateQueries({ queryKey: ["dashboardBalance", smartAccount] });
       qc.invalidateQueries({ queryKey: ["taskCount",smartAccount] });
+      qc.invalidateQueries({ queryKey: ["wallet-activity", smartAccount] });
       return true;
     } catch (error) {
       console.log("Error claiming faucet", error);

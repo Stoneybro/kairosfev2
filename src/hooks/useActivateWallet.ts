@@ -1,19 +1,18 @@
 "use client";
-import { useSmartAccount } from "@/lib/useSmartAccount";
 import { toast } from "sonner";
 import { useWallets } from "@privy-io/react-auth";
 import { encodeFunctionData } from "viem";
 import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
 import { useQueryClient } from "@tanstack/react-query";
-
+import { useSmartAccountContext } from "@/lib/smartAccountProvider";
 export function activateWallet() {
-  const { initClient } = useSmartAccount();
+  const {getClient}=useSmartAccountContext();
   const { wallets } = useWallets();
   const owner = wallets?.find((wallet) => wallet.walletClientType === "privy");
   const queryClient = useQueryClient();
   async function handleActivateWallet() {
     try {
-      const smartAccountClient = await initClient();
+      const smartAccountClient = await getClient();
       console.log("smartAccountClient", smartAccountClient);
       if (!smartAccountClient) {
         throw new Error("Smart Account Client is not initialized");

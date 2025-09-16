@@ -1,6 +1,6 @@
 "use client";
-import { Loader2, LogOut } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import { LogOut } from "lucide-react";
+import React from "react";
 import {
   Select,
   SelectContent,
@@ -11,10 +11,32 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Button } from "../ui/button";
+import { usePrivy } from "@privy-io/react-auth";
+import { useRouter } from "next/navigation";
+import LoaderButton from "../ui/loaderButton";
+import { toast } from "sonner";
 
 export default function WalletSettings() {
-  function HandleLogout() {
-    
+  const { ready, authenticated, logout } = usePrivy();
+  const router = useRouter();
+  const disabled = !ready || (ready && !authenticated);
+  async function handleLogout() {
+    try {
+      await logout();
+       await fetch("/api/session/logout", { method: "POST" });
+      localStorage.clear();
+      document.cookie.split(";").forEach((c) => {
+        document.cookie = c
+          .replace(/^ +/, "")
+          .replace(/=.*/, `=;expires=${new Date(0).toUTCString()};path=/`);
+      });
+      router.push("/");
+      return true;
+    } catch (error) {
+      console.log("logout error", error);
+      toast.error("failed to logout");
+      return false;
+    }
   }
   return (
     <div className='flex flex-col  h-full w-full p-4'>
@@ -25,7 +47,7 @@ export default function WalletSettings() {
         <div className='flex flex-col gap-2 mt-4 '>
           <div className=''>Chain</div>
           <Select>
-            <SelectTrigger  >
+            <SelectTrigger>
               <SelectValue placeholder='Base sepolia' />
             </SelectTrigger>
             <SelectContent>
@@ -36,10 +58,15 @@ export default function WalletSettings() {
             </SelectContent>
           </Select>
         </div>
-        <Button variant={"destructive"} className=" w-[135px]">
-          Log out
-          <LogOut className='h-3 w-3' />
-        </Button>
+        <LoaderButton
+        executeAction={handleLogout}
+        idleText="LogOut"
+        loadingText="Logging Out"
+        successText="Logged Out"
+        disabled={disabled}
+        variant="destructive"
+        className=' w-[135px]'
+        />
       </div>
     </div>
   );
