@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import LoadingButton from "@/components/ui/loaderButton";
 import SyncWalletAfterLogin from "@/lib/auth/syncWallet";
 import { usePrivy } from "@privy-io/react-auth";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Spinner from "@/components/ui/spinner";
 function page() {
   const [checked, setChecked] = useState(false);
