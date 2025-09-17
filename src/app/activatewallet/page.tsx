@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { activateWallet } from "@/hooks/useActivateWallet";
 import { Label } from "@radix-ui/react-label";
@@ -7,12 +7,23 @@ import { Checkbox } from "@/components/ui/checkbox";
 import LoadingButton from "@/components/ui/loaderButton";
 import SyncWalletAfterLogin from "@/lib/auth/syncWallet";
 import { usePrivy } from "@privy-io/react-auth";
+import { useRouter } from "next/router";
 import Spinner from "@/components/ui/spinner";
 function page() {
   const [checked, setChecked] = useState(false);
-  const [activated,setActivated]=useState<string>("");
+  const [activated, setActivated] = useState<string>("");
+  const [shouldNavigate, setShouldNavigate] = useState(false);
+  const router = useRouter();
   const handleActivateWallet = activateWallet();
   const { ready, authenticated, user } = usePrivy();
+  useEffect(() => {
+    if (shouldNavigate) {
+      const timer = setTimeout(() => {
+        router.push("/dashboard");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldNavigate, router]);
   if (!ready || !authenticated || !user) {
     return (
       <div className='w-full h-screen flex justify-center items-center'>
@@ -70,7 +81,11 @@ function page() {
           <LoadingButton
             executeAction={async () => {
               const result = await handleActivateWallet();
-              if(result)setActivated("Routing you to the dashboard...")
+              if (result) {
+                setActivated("Routing you to the dashboard...");
+                setShouldNavigate(true); // Trigger navigation via useEffect after 2 seconds
+              }
+              router.push("/dashboard");
               return result ?? false;
             }}
             idleText='activate wallet'
@@ -79,7 +94,9 @@ function page() {
             className='w-full'
             disabled={!checked}
           />
-          <div className="text-sm mt-4 text-accent-foreground text-center">{activated}</div>
+          <div className='text-sm mt-4 text-accent-foreground text-center'>
+            {activated}
+          </div>
         </div>
         <SyncWalletAfterLogin />
       </div>
