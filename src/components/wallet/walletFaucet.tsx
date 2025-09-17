@@ -53,7 +53,7 @@ function WalletFaucet({ smartAccount }: { smartAccount: `0x${string}` }) {
   }
 
   return (
-    <div>
+    <div id="tour-claim-faucet-btn">
       {!funded && (
         <LoadingButton
           executeAction={handleFaucetClaim}
@@ -62,6 +62,7 @@ function WalletFaucet({ smartAccount }: { smartAccount: `0x${string}` }) {
           successText='claimed'
           variant='ghost'
           className='text-sm'
+
         />
       )}
     </div>

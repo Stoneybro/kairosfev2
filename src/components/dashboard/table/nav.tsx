@@ -35,7 +35,7 @@ const{data,isLoading,error}=useQuery({
       className='w-full flex flex-col gap-8 '
 
     >
-      <div className='flex items-center justify-between  bg-muted/20'  id="tour-task-tabs">
+      <div className='flex items-center justify-between  bg-muted/20'  >
         <label htmlFor='view-selector' className='sr-only'>
           View
         </label>

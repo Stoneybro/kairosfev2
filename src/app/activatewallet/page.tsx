@@ -10,6 +10,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import Spinner from "@/components/ui/spinner";
 function page() {
   const [checked, setChecked] = useState(false);
+  const [activated,setActivated]=useState<string>("");
   const handleActivateWallet = activateWallet();
   const { ready, authenticated, user } = usePrivy();
   if (!ready || !authenticated || !user) {
@@ -69,6 +70,7 @@ function page() {
           <LoadingButton
             executeAction={async () => {
               const result = await handleActivateWallet();
+              if(result)setActivated("Routing you to the dashboard...")
               return result ?? false;
             }}
             idleText='activate wallet'
@@ -77,6 +79,7 @@ function page() {
             className='w-full'
             disabled={!checked}
           />
+          <div className="text-sm mt-4 text-accent-foreground text-center">{activated}</div>
         </div>
         <SyncWalletAfterLogin />
       </div>

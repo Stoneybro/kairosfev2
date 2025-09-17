@@ -1,5 +1,5 @@
 "use client";
-import { LogOut } from "lucide-react";
+
 import React from "react";
 import {
   Select,
@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Button } from "../ui/button";
+
 import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
 import LoaderButton from "../ui/loaderButton";

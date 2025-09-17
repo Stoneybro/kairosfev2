@@ -127,8 +127,8 @@ function Tasks({
           <span className='text-muted-foreground flex items-center gap-1'>
             <MdOutlineDescription /> description
           </span>
-          <span className=' text-xs'>{taskData.description}</span>
         </div>
+        <div className="bg-muted w-full px-3 py-2 rounded-lg"><span className=' text-xs'>{taskData.description}</span></div>
         <div className='flex justify-between items-center w-full'>
           <span className='text-muted-foreground flex items-center gap-1'>
             <PiSpinner /> status
@@ -162,12 +162,12 @@ function Tasks({
               </span>
               <span>{formatTime(Number(taskData.delayDuration))}</span>
             </div>
-            <div className='flex justify-between items-center w-full'>
+            {taskData.status==3 && taskData.delayedRewardReleased==false&& <div className='flex justify-between items-center w-full'>
               <span className='text-muted-foreground flex items-center gap-1'>
                 <SiStagetimer /> time remaining
               </span>
               <span>{timeRemaining}</span>
-            </div>
+            </div>}
             </div>
           )}
         {taskData.choice == 2 &&
@@ -213,7 +213,7 @@ function Tasks({
       )}
       {taskData.status == 3 &&
         !taskData.delayedRewardReleased &&
-        taskData.choice == 1 && (
+        taskData.choice == 1 &&taskData.delayedRewardReleased==false && (
           <div className='flex justify-start gap-4 items-center max-w-sm'>
             <LoaderButton
               className=''
@@ -222,6 +222,7 @@ function Tasks({
               successText='Funds Released!'
               timeoutMs={60000}
               executeAction={() => handleRelease(taskData.id.toString())}
+              disabled={timeRemaining!="Withdrawable"}
             />
           </div>
         )}

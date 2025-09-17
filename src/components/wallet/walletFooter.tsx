@@ -23,10 +23,10 @@ export default function WalletFooter({
         <ToggleGroupItem value='home' aria-label='home'>
           <RiHome6Line className='!h-6 !w-6' />
         </ToggleGroupItem>
-        <ToggleGroupItem value='activity' aria-label='activity'>
+        <ToggleGroupItem value='activity' aria-label='activity' id="tour-wallet-activity">
           <FiClock className='!h-6 !w-6' />
         </ToggleGroupItem>
-        <ToggleGroupItem value='settings' aria-label='settings'>
+        <ToggleGroupItem value='settings' aria-label='settings' id="tour-settings">
           <IoSettingsOutline className='!h-6 !w-6' />
         </ToggleGroupItem>
       </ToggleGroup>

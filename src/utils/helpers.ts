@@ -202,7 +202,7 @@ export async function fetchTasks(
     args: [status, start, limit],
   });
   const serializedResult = toSerializable(result);
-  return serializedResult;
+   return Array.isArray(serializedResult) ? serializedResult.reverse() : serializedResult;
 }
 export async function fetchTasksCount(smartAccount: `0x${string}`) {
   const result = await readContract({

@@ -3,7 +3,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchWalletActivity, formatNumber } from "@/utils/helpers";
 import { Tx } from "@/types";
 import { getTransactionType } from "@/utils/helpers";
-import { BsSendCheck } from "react-icons/bs"; // your function
+import { BsSendCheck } from "react-icons/bs";
 import { CgFileDocument } from "react-icons/cg";
 import { GrCycle } from "react-icons/gr";
 import ActivitySkeleton from "./activitySkeleton";
@@ -19,16 +19,48 @@ function Activity({ smartAccount }: { smartAccount: `0x${string}` }) {
     staleTime: 1000 * 60,
     retry: 2,
   });
-  if (isLoading) return <ActivitySkeleton />;
-  if (error) {
-    return <div className='  w-full text-center'>Failed to load activity.</div>;
-  }
 
   const allTxs = data ? data.pages.flat() : [];
-  if (!isLoading && allTxs.length === 0) {
+  
+  // Deduplicate transactions by hash, preferring incoming/received transactions
+  const deduplicatedTxs = React.useMemo(() => {
+    if (allTxs.length === 0) return [];
+    
+    const txMap = new Map<string, Tx>();
+    
+    allTxs.forEach(tx => {
+      const hash = tx.transactionHash;
+      const { isIncoming } = getTransactionType(tx, smartAccount);
+      
+      if (!txMap.has(hash)) {
+        // First occurrence of this hash
+        txMap.set(hash, tx);
+      } else {
+        // Duplicate found - keep the incoming one if current tx is incoming
+        // and existing one is not, otherwise keep the existing one
+        const existingTx = txMap.get(hash)!;
+        const { isIncoming: existingIsIncoming } = getTransactionType(existingTx, smartAccount);
+        
+        if (isIncoming && !existingIsIncoming) {
+          txMap.set(hash, tx);
+        }
+      }
+    });
+    
+    return Array.from(txMap.values());
+  }, [allTxs, smartAccount]);
+
+  if (isLoading) return <ActivitySkeleton />;
+  if (error) {
+    return <div className='w-full text-center'>Failed to load activity.</div>;
+  }
+
+  if (!isLoading && deduplicatedTxs.length === 0) {
     return <div className='w-full text-center'>No activity yet.</div>;
   }
-  console.log(allTxs);
+
+  console.log('Original transactions:', allTxs.length);
+  console.log('Deduplicated transactions:', deduplicatedTxs.length);
 
   return (
     <div className='flex flex-col gap-2 justify-start items-start px-4 mb-auto w-full'>
@@ -37,7 +69,7 @@ function Activity({ smartAccount }: { smartAccount: `0x${string}` }) {
         Task transactions are not available
       </div>
       <div className='w-full'>
-        {allTxs.map((tx, index) => {
+        {deduplicatedTxs.map((tx, index) => {
           const { type, isIncoming } = getTransactionType(tx, smartAccount);
           return (
             <a

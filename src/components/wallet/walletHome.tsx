@@ -68,7 +68,7 @@ export default function WalletHome({
       <div className='w-full max-w-sm space-y-4'>
         {/* Top Row */}
 
-        <div className='grid grid-cols-2 gap-4'>
+        <div className='grid grid-cols-2 gap-4 '  id='tour-send-receive-btn'>
           <Button
             variant={"outline"}
             onClick={() => setActiveTab("receive")}
@@ -82,7 +82,7 @@ export default function WalletHome({
             onClick={() => setActiveTab("send")}
             variant={"outline"}
             className='w-full'
-            id='tour-send-btn'
+           
           >
             <ArrowUpDown />
             <span className=' font-medium'>Send</span>

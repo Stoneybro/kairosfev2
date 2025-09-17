@@ -125,7 +125,7 @@ export function TaskTableWrapper({
   const statusCount = taskCount?.[TASK_STATUS_MAP[activeTab]] ?? 0;
 
   return (
-    <div className='flex flex-col gap-8'>
+    <div className='flex flex-col gap-8' id="tour-tasks">
       <div className='flex justify-between items-center'>
         <TableNav
           activeTab={activeTab}

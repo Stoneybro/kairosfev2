@@ -4,7 +4,7 @@ import { encodeFunctionData } from "viem";
 import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
 import { useSmartAccountContext } from "@/lib/smartAccountProvider";
 type SendArgsType = {
-  address:`0x${string}`;
+  address: `0x${string}`;
   amount: bigint;
 };
 
@@ -19,11 +19,7 @@ export function useSend(smartAccount: `0x${string}`) {
       const callData = encodeFunctionData({
         abi: SMART_ACCOUNT_ABI,
         functionName: "execute",
-        args: [
-          payLoad.address,
-          payLoad.amount,
-            "0x",
-        ],
+        args: [payLoad.address, payLoad.amount, "0x"],
       });
 
       const hash = await client.sendUserOperation({
@@ -42,8 +38,8 @@ export function useSend(smartAccount: `0x${string}`) {
     onSuccess: (data, payLoad) => {
       qc.invalidateQueries({ queryKey: ["tasks", smartAccount] });
       qc.invalidateQueries({ queryKey: ["dashboardBalance", smartAccount] });
-      qc.invalidateQueries({ queryKey: ["taskCount",smartAccount] });
-      
+      qc.invalidateQueries({ queryKey: ["taskCount", smartAccount] });
+      qc.invalidateQueries({ queryKey: ["wallet-activity", smartAccount] });
     },
     onError: (err, payLoad, context: any) => {
       console.log(err);
