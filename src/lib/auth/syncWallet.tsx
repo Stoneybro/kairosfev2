@@ -43,7 +43,13 @@ async function syncWalletOnServer(walletAddr: string, signal?: AbortSignal) {
   return res.json();
 }
 
-export default function SyncWalletAfterLogin() {
+interface SyncWalletAfterLoginProps {
+  isActivating?: boolean;
+}
+
+export default function SyncWalletAfterLogin({
+  isActivating = false,
+}: SyncWalletAfterLoginProps) {
   const { ready, user, authenticated, login } = usePrivy();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -59,6 +65,7 @@ export default function SyncWalletAfterLogin() {
     staleTime: 5 * 60 * 1000,
     retry: 1,
   });
+
   useEffect(() => {
     const onVisibility = async () => {
       if (document.visibilityState !== "visible") return;
@@ -88,7 +95,9 @@ export default function SyncWalletAfterLogin() {
   }, [queryClient, wallet]);
 
   useEffect(() => {
-    if (!query.isFetched) return;
+    // Skip navigation logic if currently activating wallet
+    if (!query.isFetched || isActivating) return;
+
     (async () => {
       if (query.isError) {
         try {
@@ -98,16 +107,29 @@ export default function SyncWalletAfterLogin() {
             return;
           }
         } catch (e) {}
-        router.replace("/login");
+        // Only redirect to login if we're not in the middle of activation
+        if (!isActivating) {
+          router.replace("/login");
+        }
         return;
       }
 
       const data = query.data as any;
-      if (data?.activated) router.push("/dashboard");
-      else if (data?.ok && !data?.activated) router.push("/activatewallet");
-      else router.replace("/login");
+      if (data?.activated) {
+        router.push("/dashboard");
+      } else if (data?.ok && !data?.activated) {
+        // Only redirect to activate wallet if we're not already there
+        if (window.location.pathname !== "/activatewallet") {
+          router.push("/activatewallet");
+        }
+      } else {
+        // Only redirect to login if we're not in the middle of activation
+        if (!isActivating) {
+          router.replace("/login");
+        }
+      }
     })();
-  }, [query.isFetched, query.isError, query.data, router]);
+  }, [query.isFetched, query.isError, query.data, router, isActivating]);
 
   return null;
 }

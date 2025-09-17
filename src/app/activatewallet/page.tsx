@@ -8,22 +8,41 @@ import LoadingButton from "@/components/ui/loaderButton";
 import SyncWalletAfterLogin from "@/lib/auth/syncWallet";
 import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import Spinner from "@/components/ui/spinner";
+
 function page() {
   const [checked, setChecked] = useState(false);
   const [activated, setActivated] = useState<string>("");
   const [shouldNavigate, setShouldNavigate] = useState(false);
+  const [isActivating, setIsActivating] = useState(false); // Add isActivating state
   const router = useRouter();
+  const queryClient = useQueryClient();
   const handleActivateWallet = activateWallet();
   const { ready, authenticated, user } = usePrivy();
+
   useEffect(() => {
     if (shouldNavigate) {
-      const timer = setTimeout(() => {
+      const timer = setTimeout(async () => {
+        // Force a refetch of the sync query to ensure server has updated status
+        try {
+          await queryClient.invalidateQueries({
+            queryKey: ["sync-session", user?.wallet?.address],
+          });
+          // Small delay to let the query update
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (e) {
+          // If query invalidation fails, still navigate
+          console.warn("Failed to invalidate queries:", e);
+        }
+        
         router.push("/dashboard");
+        setIsActivating(false); // Reset isActivating after navigation
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [shouldNavigate, router]);
+  }, [shouldNavigate, router, user?.wallet?.address, queryClient]);
+
   if (!ready || !authenticated || !user) {
     return (
       <div className='w-full h-screen flex justify-center items-center'>
@@ -33,6 +52,7 @@ function page() {
       </div>
     );
   }
+
   return (
     <div>
       <div className='bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10'>
@@ -80,12 +100,14 @@ function page() {
           </Label>
           <LoadingButton
             executeAction={async () => {
+              setIsActivating(true); // Start activation process
               const result = await handleActivateWallet();
               if (result) {
                 setActivated("Routing you to the dashboard...");
                 setShouldNavigate(true); // Trigger navigation via useEffect after 2 seconds
+              } else {
+                setIsActivating(false); // Reset if activation failed
               }
-              router.push("/dashboard");
               return result ?? false;
             }}
             idleText='activate wallet'
@@ -98,7 +120,7 @@ function page() {
             {activated}
           </div>
         </div>
-        <SyncWalletAfterLogin />
+        <SyncWalletAfterLogin isActivating={isActivating} />
       </div>
     </div>
   );
