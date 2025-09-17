@@ -47,9 +47,7 @@ interface SyncWalletAfterLoginProps {
   isActivating?: boolean;
 }
 
-export default function SyncWalletAfterLogin({
-  isActivating = false,
-}: SyncWalletAfterLoginProps) {
+export default function SyncWalletAfterLogin({ isActivating = false }: SyncWalletAfterLoginProps) {
   const { ready, user, authenticated, login } = usePrivy();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -58,7 +56,7 @@ export default function SyncWalletAfterLogin({
   const query = useQuery({
     queryKey: ["sync-session", wallet],
     queryFn: ({ signal }) => syncWalletOnServer(wallet as string, signal),
-    enabled: Boolean(ready && authenticated && wallet),
+    enabled: Boolean(ready && authenticated && wallet && !isActivating), // Disable query during activation
     refetchOnWindowFocus: false,
     refetchInterval: 4 * 60 * 1000,
     refetchOnReconnect: false,
@@ -96,8 +94,12 @@ export default function SyncWalletAfterLogin({
 
   useEffect(() => {
     // Skip navigation logic if currently activating wallet
-    if (!query.isFetched || isActivating) return;
+    if (!query.isFetched || isActivating) {
+      return;
+    }
+    
 
+    
     (async () => {
       if (query.isError) {
         try {
