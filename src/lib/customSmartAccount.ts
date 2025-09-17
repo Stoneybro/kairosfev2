@@ -1,4 +1,3 @@
-// customSmartAccount.tsx
 import { useCallback, useEffect, useState } from "react";
 import { toSmartAccount } from "viem/account-abstraction";
 import { encodeFunctionData } from "viem";
@@ -13,8 +12,8 @@ import { publicClient } from "./pimlico";
 import type { SmartAccount } from "viem/account-abstraction";
 
 export type CustomSmartAccount = SmartAccount;
-
-export default function useCustomSmartAccount() {
+// function for initializing and managing a custom Smart Account (ERC-4337 style)
+export default function CustomSmartAccount() {
   const [customSmartAccount, setCustomSmartAccount] =
     useState<CustomSmartAccount | null>(null);
   const { wallets } = useWallets();
@@ -24,7 +23,7 @@ export default function useCustomSmartAccount() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  // Reset if owner changes
+  // Reset account state when owner changes
   useEffect(() => {
     setCustomSmartAccount(null);
     setError(null);
@@ -32,10 +31,10 @@ export default function useCustomSmartAccount() {
   }, [owner?.address]);
 
   // ----------------- CONFIG -----------------
-  const ENTRY_POINT_ADDR = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"; // v0.6
+  const ENTRY_POINT_ADDR = "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"; // v0.6 entry point
   const ENTRY_POINT_VERSION = "0.6";
 
-  // Compute deterministic address via factory helper
+  // Predict smart account address (factory call)
   async function predictAddress(ownerAddress: `0x${string}`) {
     return publicClient.readContract({
       address: CONTRACT_ADDRESSES.ACCOUNT_FACTORY,
@@ -45,20 +44,17 @@ export default function useCustomSmartAccount() {
     }) as Promise<`0x${string}`>;
   }
 
+  // Initialize custom smart account
   const initCustomAccount = useCallback(async () => {
     setError(null);
 
     if (!owner || !owner.address) {
-      const err = new Error(
-        "Owner address is undefined. Ensure a valid wallet is connected."
-      );
+      const err = new Error("Owner address is undefined. Ensure a valid wallet is connected.");
       setError(err);
       throw err;
     }
 
-    if (customSmartAccount) {
-      return customSmartAccount;
-    }
+    if (customSmartAccount) return customSmartAccount;
 
     setIsLoading(true);
     try {
@@ -69,20 +65,16 @@ export default function useCustomSmartAccount() {
           version: ENTRY_POINT_VERSION,
           abi: ENTRYPOINT_ABI,
         },
+        // Minimal adapter for encoding/decoding calls
         async decodeCalls(data) {
-          return [
-            {
-              to: "0x0000000000000000000000000000000000000000",
-              value: 0n,
-              data,
-            },
-          ];
+          return [{ to: "0x0000000000000000000000000000000000000000", value: 0n, data }];
         },
         async encodeCalls(calls) {
           if (calls.length !== 1) throw new Error("minimal adapter supports 1 call");
           const [c] = calls;
           return c.data ?? "0x";
         },
+        // Account factory + nonce helpers
         async getAddress() {
           return predictAddress(owner.address as `0x${string}`);
         },
@@ -108,6 +100,7 @@ export default function useCustomSmartAccount() {
         async getStubSignature() {
           return "0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c" as `0x${string}`;
         },
+        // Message + typedData signing (via Privy)
         async signMessage({ message }) {
           const msgStr = typeof message === "string" ? message : (message.raw as `0x${string}`);
           const { signature } = await privySignMessage({ message: msgStr });
@@ -128,7 +121,9 @@ export default function useCustomSmartAccount() {
           });
           return signature as `0x${string}`;
         },
+        // UserOperation signing for EntryPoint
         async signUserOperation(userOperation) {
+          // Set safe defaults if missing
           if (!userOperation.verificationGasLimit || userOperation.verificationGasLimit === 0n) {
             userOperation.verificationGasLimit = 2_000_000n;
           }
@@ -139,6 +134,7 @@ export default function useCustomSmartAccount() {
             userOperation.preVerificationGas = 20_000n;
           }
 
+          // Build hash for signing
           const uoForHash = {
             sender: userOperation.sender as `0x${string}`,
             nonce: userOperation.nonce,
@@ -153,6 +149,7 @@ export default function useCustomSmartAccount() {
             signature: "0x",
           } as const;
 
+          // Get userOpHash from EntryPoint
           const userOpHash = await publicClient.readContract({
             address: ENTRY_POINT_ADDR,
             abi: ENTRYPOINT_ABI,
@@ -160,6 +157,7 @@ export default function useCustomSmartAccount() {
             args: [uoForHash],
           });
 
+          // EIP-712 signing domain
           const chainId = Number(await publicClient.getChainId());
           const domain = {
             name: "EntryPoint",
@@ -167,11 +165,7 @@ export default function useCustomSmartAccount() {
             chainId,
             verifyingContract: ENTRY_POINT_ADDR,
           };
-
-          const types = {
-            UserOperation: [{ name: "userOpHash", type: "bytes32" }],
-          };
-
+          const types = { UserOperation: [{ name: "userOpHash", type: "bytes32" }] };
           const message = { userOpHash };
 
           const { signature } = await privySignTypedData({
@@ -195,6 +189,7 @@ export default function useCustomSmartAccount() {
     }
   }, [owner?.address, privySignMessage, privySignTypedData, customSmartAccount]);
 
+  // Reset state manually if needed
   const resetCustomAccount = useCallback(() => {
     setCustomSmartAccount(null);
     setError(null);

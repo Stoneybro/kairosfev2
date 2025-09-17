@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import {
   Popover,
@@ -21,43 +22,45 @@ export default function DatePicker({
 
   return (
     <div>
-      <div className='text-muted-foreground text-sm mb-1'>Deadline</div>
-      <div className='flex gap-3'>
+      <div className="text-muted-foreground text-sm mb-1">Deadline</div>
+      <div className="flex gap-3">
+        {/* Calendar popover */}
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
-              variant='outline'
-              className='justify-between font-normal text-muted-foreground'
+              variant="outline"
+              className="justify-between font-normal text-muted-foreground"
             >
               {value ? value.toLocaleDateString() : "Select date"}
               <ChevronDownIcon />
             </Button>
           </PopoverTrigger>
 
-          <PopoverContent className='w-auto overflow-hidden p-0' align='start'>
+          <PopoverContent className="w-auto overflow-hidden p-0" align="start">
             <Calendar
-              mode='single'
+              mode="single"
               selected={value ?? undefined}
-              captionLayout='dropdown'
+              captionLayout="dropdown"
               onSelect={(d: Date | undefined) => onChange(d ?? null)}
             />
           </PopoverContent>
         </Popover>
-        <div className='flex flex-col gap-3 w-32'>
+
+        {/* Time input */}
+        <div className="flex flex-col gap-3 w-32">
           <Input
-            type='time'
+            type="time"
             value={
               value
-                ? `${String(new Date(value).getHours()).padStart(
-                    2,
-                    "0"
-                  )}:${String(new Date(value).getMinutes()).padStart(2, "0")}`
+                ? `${String(new Date(value).getHours()).padStart(2, "0")}:${String(
+                    new Date(value).getMinutes()
+                  ).padStart(2, "0")}`
                 : "10:30"
             }
             onChange={(e) => {
-              const t = e.target.value; // "" or "HH:MM"
+              const t = e.target.value; // format: "HH:MM"
               if (!t) {
-                onChange(null); // clear the value if user deletes
+                onChange(null);
                 return;
               }
 
@@ -66,9 +69,9 @@ export default function DatePicker({
               d.setHours(hh, mm, 0, 0);
               onChange(d);
             }}
-            className='bg-background text-muted-foreground appearance-none 
+            className="bg-background text-muted-foreground appearance-none 
              [&::-webkit-calendar-picker-indicator]:hidden 
-             [&::-webkit-calendar-picker-indicator]:appearance-none'
+             [&::-webkit-calendar-picker-indicator]:appearance-none"
           />
         </div>
       </div>

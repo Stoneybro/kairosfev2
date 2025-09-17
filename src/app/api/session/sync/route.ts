@@ -61,7 +61,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "wallet-not-linked" }, { status: 403 });
   }
 
-  // on-chain check
+  // on-chain check for activation
   let rawRes;
   try {
     rawRes = await readContract({

@@ -1,4 +1,5 @@
 "use client";
+
 import {
   ColumnDef,
   flexRender,
@@ -18,6 +19,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { TabKey, TaskTableData } from "@/types";
 
+/**
+ * Props for DataTable component.
+ * 
+ * - `columns`: Table column definitions (TanStack Table).
+ * - `data`: Task data to display.
+ * - `page`: Keeps track of current page number for each tab.
+ * - `setPage`: Updates pagination state for the active tab.
+ * - `activeTab`: Currently selected tab (Active, Completed, etc.).
+ * - `statusCount`: Total number of items for the current tab.
+ * - `itemsPerPage`: Items displayed per page.
+ */
 interface DataTableProps<TValue> {
   columns: ColumnDef<TaskTableData, TValue>[];
   data: TaskTableData[];
@@ -49,26 +61,35 @@ export function DataTable<TValue>({
   statusCount,
   itemsPerPage,
 }: DataTableProps<TValue>) {
+  const router = useRouter();
+
+  // Maps each tab label to its corresponding pagination key.
   const tabToPageKey: Record<TabKey, keyof typeof page> = {
     "Active tasks": "active",
     "Completed tasks": "completed",
     "Canceled tasks": "canceled",
     "Expired tasks": "expired",
   };
-  const router = useRouter();
+
+  // Initialize TanStack table instance.
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    manualPagination: true,
+    manualPagination: true, // external pagination handled separately
   });
+
+  // Derive current status slug and pagination state.
   const statusSlug = activeTab.toLowerCase().replace(/\s+/g, "-");
-  const pageKey = tabToPageKey[activeTab] as keyof typeof page;
+  const pageKey = tabToPageKey[activeTab];
   const currentPage = page[pageKey] ?? 1;
+
   const totalPages =
     statusCount && itemsPerPage > 0
       ? Math.max(1, Math.ceil(statusCount / itemsPerPage))
       : 1;
+
+  // Update active tab's page state.
   const handlePageChange = (newPage: number) => {
     setPage((prev) => ({
       ...prev,
@@ -78,36 +99,37 @@ export function DataTable<TValue>({
 
   return (
     <>
-      <div className={`w-full  border rounded`} >
+      <div className="w-full border rounded">
         <Table>
-          <TableHeader className='bg-muted'>
+          {/* Table Header */}
+          <TableHeader className="bg-muted">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead
-                      key={header.id}
-                      className='pl-4 py-2 text-[16px]'
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className="pl-4 py-2 text-[16px]"
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
+
+          {/* Table Body */}
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className='cursor-pointer'
+                  className="cursor-pointer"
                   onClick={() =>
                     router.push(
                       `/dashboard/${statusSlug}/${row.original.slug.toString()}`
@@ -115,10 +137,10 @@ export function DataTable<TValue>({
                   }
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className='pl-4 py-4'>
+                    <TableCell key={cell.id} className="pl-4 py-4">
                       <Link
                         href={`/dashboard/${statusSlug}/${row.original.slug.toString()}`}
-                        className='block w-full h-full'
+                        className="block w-full h-full"
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
@@ -130,10 +152,11 @@ export function DataTable<TValue>({
                 </TableRow>
               ))
             ) : (
+              // Empty state
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className='h-24 text-center'
+                  className="h-24 text-center"
                 >
                   No results.
                 </TableCell>
@@ -142,6 +165,8 @@ export function DataTable<TValue>({
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination */}
       <ServerPagination
         currentPage={currentPage}
         totalPages={totalPages}

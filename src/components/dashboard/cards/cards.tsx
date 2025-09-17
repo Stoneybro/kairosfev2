@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Card,
   CardAction,
@@ -13,10 +14,12 @@ import { MdLock } from "react-icons/md";
 import { BiBullseye } from "react-icons/bi";
 import { useQuery } from "@tanstack/react-query";
 import { CardsSkeleton } from "./cardsSkeleton";
-import { fetchTasksCount } from "@/utils/helpers";
-import { fetchDashboardBalance } from "@/utils/helpers";
+import { fetchTasksCount, fetchDashboardBalance } from "@/utils/helpers";
 
 export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
+  /**
+   * Dashboard balances: available balance and commited funds.
+   */
   const { data: cardData, isLoading: cardDataIsLoading } = useQuery({
     queryKey: ["dashboardBalance", smartAccount],
     queryFn: () => fetchDashboardBalance(smartAccount),
@@ -24,11 +27,12 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
     refetchOnReconnect: false,
     staleTime: Infinity,
   });
-  const {
-    data: taskCount,
-    isLoading: taskCountLoading,
-    error,
-  } = useQuery({
+
+  /**
+   * Task counts: [Active, Completed, Canceled, Expired].
+   * Used to calculate performance percentage and task stats.
+   */
+  const { data: taskCount, isLoading: taskCountLoading } = useQuery({
     queryKey: ["taskCount", smartAccount],
     queryFn: () => fetchTasksCount(smartAccount),
     staleTime: Infinity,
@@ -37,16 +41,26 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
   if (cardDataIsLoading && taskCountLoading) {
     return <CardsSkeleton />;
   }
+
+  // Total tasks counts (default to 0 if no data yet)
   const total = taskCount?.reduce((a: number, b: any) => a + Number(b), 0) ?? 0;
-  let performance = 0;
-  if (total > 0) {
-    const raw = (Number(taskCount[1]) / total) * 100;
-    performance = parseFloat(raw.toFixed(2));
-  }
+
+  // Performance = % of completed tasks out of total
+  const performance =
+    total > 0
+      ? parseFloat(((Number(taskCount[1]) / total) * 100).toFixed(2))
+      : 0;
 
   return (
-    <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4  *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs  @xl/main:grid-cols-2 @5xl/main:grid-cols-4' id='tour-cards'>
-      <Card className='@container/card' >
+    <div
+      id='tour-cards'
+      className='grid grid-cols-1 gap-4 @xl/main:grid-cols-2 @5xl/main:grid-cols-4
+                 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:from-primary/5
+                 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card
+                 *:data-[slot=card]:shadow-xs'
+    >
+      {/* Available balance */}
+      <Card className='@container/card'>
         <CardHeader>
           <CardDescription>Available Balance</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
@@ -57,12 +71,11 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
           </CardAction>
         </CardHeader>
         <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-          <div className='line-clamp-1 flex gap-2 font-medium'>
-            For tasks, and transfers
-          </div>
+          <div className='font-medium'>For tasks and transfers</div>
         </CardFooter>
       </Card>
 
+      {/* Active tasks */}
       <Card className='@container/card'>
         <CardHeader>
           <CardDescription>Active Tasks</CardDescription>
@@ -74,27 +87,27 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
           </CardAction>
         </CardHeader>
         <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-          <div className='line-clamp-1 flex gap-2 font-medium'>
-            No active tasks
-          </div>
+          <div className='font-medium'>No active tasks</div>
         </CardFooter>
       </Card>
+
+      {/* Committed funds */}
       <Card className='@container/card'>
         <CardHeader>
-          <CardDescription>Commited Funds</CardDescription>
+          <CardDescription>Committed Funds</CardDescription>
           <CardTitle className='!text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-            {`${cardData?.commitedFunds} ETH`}
+            {`${cardData?.committedFunds} ETH`}
           </CardTitle>
           <CardAction>
             <MdLock size={35} />
           </CardAction>
         </CardHeader>
         <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-          <div className='line-clamp-1 flex gap-2 font-medium'>
-            Locked in active tasks & penalties
-          </div>
+          <div className='font-medium'>Locked in active tasks & penalties</div>
         </CardFooter>
       </Card>
+
+      {/* Task performance */}
       <Card className='@container/card' id='tour-performance-card'>
         <CardHeader>
           <CardDescription>Task Performance</CardDescription>
@@ -106,9 +119,7 @@ export function Cards({ smartAccount }: { smartAccount: `0x${string}` }) {
           </CardAction>
         </CardHeader>
         <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-          <div className='line-clamp-1 flex gap-2 font-medium'>
-            Overall success rate
-          </div>
+          <div className='font-medium'>Overall success rate</div>
         </CardFooter>
       </Card>
     </div>

@@ -5,6 +5,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
+// FAQ data kept separate for clarity & scalability.
+// Each item can hold multiple paragraphs in `answer`.
 const faqData = [
   {
     value: "item-1",
@@ -57,7 +59,7 @@ const faqData = [
     value: "item-7",
     question: "Can I use Kairos with a partner?",
     answer: [
-      "No. Only manual verification of tasks is available currently, but partner verification feature would be released soon",
+      "No. Only manual verification of tasks is available currently, but partner verification will be released soon.",
     ],
   },
   {
@@ -81,30 +83,33 @@ const faqData = [
 export function Faq() {
   return (
     <>
-      <div className='h-full w-full flex justify-center items-center text-5xl py-16 px-6'>
+      {/* Section heading */}
+      <div className="h-full w-full flex justify-center items-center text-5xl py-16 px-6">
         <h4>FAQ</h4>
       </div>
-      <div className=" max-w-2xl mx-auto px-6">
 
-              <Accordion
-        type='single'
-        collapsible
-        className='w-full'
-        defaultValue='item-1'
-      >
-        {faqData.map(({ value, question, answer }) => (
-          <AccordionItem key={value} value={value}>
-            <AccordionTrigger className="text-lg">{question}</AccordionTrigger>
-            <AccordionContent className='flex flex-col gap-4 text-balance'>
-              {answer.map((text, idx) => (
-                <p key={idx}>{text}</p>
-              ))}
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+      {/* FAQ accordion */}
+      <div className="max-w-2xl mx-auto px-6">
+        <Accordion
+          type="single"
+          collapsible
+          className="w-full"
+          defaultValue="item-1"
+        >
+          {faqData.map(({ value, question, answer }) => (
+            <AccordionItem key={value} value={value}>
+              <AccordionTrigger className="text-lg">
+                {question}
+              </AccordionTrigger>
+              <AccordionContent className="flex flex-col gap-4 text-balance">
+                {answer.map((text, idx) => (
+                  <p key={idx}>{text}</p>
+                ))}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </div>
-
     </>
   );
 }

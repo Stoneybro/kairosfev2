@@ -7,24 +7,39 @@ interface ShaderBackgroundProps {
   children: React.ReactNode
 }
 
+/**
+ * ShaderBackground
+ *
+ * Provides a staged, performance-aware shader background with graceful fallbacks.
+ * - Uses a CSS image fallback so LCP paints immediately.
+ * - Defers shader mount until after initial paint (double RAF).
+ * - Probes device performance (cores, memory, FPS) to disable shaders on weak devices.
+ * - Scales rendering resolution down on low-perf devices to reduce GPU load.
+ * - Adds hover interactivity (activates gradients) only for capable, non-mobile devices.
+ * - Two gradient layers (light and heavy) mounted in stages:
+ *   Layer A = lightweight, mounts first
+ *   Layer B = heavier, delayed to avoid blocking LCP
+ */
 export default function ShaderBackground({ children }: ShaderBackgroundProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const rafRef = useRef<number | null>(null)
-  const rafRef2 = useRef<number | null>(null)
-  const probeRafRef = useRef<number | null>(null)
-  const timeouts = useRef<number[]>([])
+  /** --- REFS --- */
+  const containerRef = useRef<HTMLDivElement | null>(null) // root container
+  const rafRef = useRef<number | null>(null)              // first rAF staging
+  const rafRef2 = useRef<number | null>(null)             // second rAF staging
+  const probeRafRef = useRef<number | null>(null)         // performance probe loop
+  const timeouts = useRef<number[]>([])                   // keep track of active timeouts
 
-  const [isActive, setIsActive] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-  const [lowPerf, setLowPerf] = useState(false)
-  const [renderScale, setRenderScale] = useState(1)
+  /** --- STATE --- */
+  const [isActive, setIsActive] = useState(false)         // whether user is hovering (desktop only)
+  const [isMobile, setIsMobile] = useState(false)         // responsive detection (debounced)
+  const [lowPerf, setLowPerf] = useState(false)           // whether device is marked low performance
+  const [renderScale, setRenderScale] = useState(1)       // render downscaling factor for perf
 
-  // controls when shaders mount (starts false so fallback paints first)
+  // whether shaders should mount at all (false until staged mount is complete)
   const [shadersAllowed, setShadersAllowed] = useState(false)
-  // enable heavy second layer later to avoid LCP impacts
+  // whether to enable second, heavier gradient layer (delayed for perf)
   const [enableLayerB, setEnableLayerB] = useState(false)
 
-  // debounced mobile detection
+  /** --- MOBILE DETECTION (debounced resize) --- */
   useEffect(() => {
     let t: number | null = null
     const check = () => setIsMobile(window.innerWidth < 768)
@@ -33,22 +48,22 @@ export default function ShaderBackground({ children }: ShaderBackgroundProps) {
       t = window.setTimeout(() => {
         check()
         t = null
-      }, 150)
+      }, 150) // debounce: avoid thrashing during continuous resize
     }
-    check()
+    check() // initial run
     window.addEventListener("resize", onResize, { passive: true })
     return () => window.removeEventListener("resize", onResize)
   }, [])
 
-  // reduced motion
+  /** --- REDUCED MOTION PREFERENCE --- */
   const prefersReducedMotion = useMemo(() => {
     if (typeof window === "undefined") return false
-    return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
   }, [])
 
-  // staged mount + conservative probe
+  /** --- STAGED MOUNT + PERFORMANCE PROBE --- */
   useEffect(() => {
-    // quick hardware heuristic: immediate low-perf for very weak devices
+    // Quick hardware heuristic: flag weak devices immediately
     const cores = navigator.hardwareConcurrency || 2
     const deviceMemory = (navigator as any).deviceMemory || 0
     if (cores <= 4 || (deviceMemory && deviceMemory <= 2)) {
@@ -58,23 +73,22 @@ export default function ShaderBackground({ children }: ShaderBackgroundProps) {
       return
     }
 
+    // Respect system motion preferences: disable shaders entirely
     if (prefersReducedMotion) {
-      // respect reduced motion: keep fallback, no shaders
       setLowPerf(true)
       setShadersAllowed(false)
       return
     }
 
-    // Ensure fallback paints first: double rAF before mounting shaders
+    // Double requestAnimationFrame ensures fallback CSS paints before mounting shaders
     rafRef.current = requestAnimationFrame(() => {
       rafRef2.current = requestAnimationFrame(() => {
-        // allow shaders to mount now (image has painted)
-        setShadersAllowed(true)
+        setShadersAllowed(true) // safe to mount shaders now
 
-        // enable heavy second layer after a delay (prevents LCP waiting)
+        // Stage in heavy Layer B later to avoid blocking LCP
         timeouts.current.push(window.setTimeout(() => setEnableLayerB(true), 900))
 
-        // give shader a short warm-up then run a longer probe
+        // Warm-up then probe sustained FPS to decide if shaders should be disabled
         timeouts.current.push(
           window.setTimeout(() => {
             let frames = 0
@@ -86,7 +100,7 @@ export default function ShaderBackground({ children }: ShaderBackgroundProps) {
               } else {
                 const duration = ts - probeStart
                 const fps = frames / (duration / 1000)
-                // relaxed threshold: only disable shaders on sustained very low fps
+                // Only mark low perf if FPS is *consistently* poor
                 if (fps < 28) {
                   setLowPerf(true)
                   setRenderScale(0.5)
@@ -99,11 +113,12 @@ export default function ShaderBackground({ children }: ShaderBackgroundProps) {
               }
             }
             probeRafRef.current = requestAnimationFrame(probe)
-          }, 500) // warm-up before probing
+          }, 500) // short warm-up before probing
         )
       })
     })
 
+    // Cleanup all async handles
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
       if (rafRef2.current) cancelAnimationFrame(rafRef2.current)
@@ -113,7 +128,7 @@ export default function ShaderBackground({ children }: ShaderBackgroundProps) {
     }
   }, [prefersReducedMotion])
 
-  // mouse enter/leave only on capable devices
+  /** --- INTERACTIVITY: hover activation (desktop only) --- */
   useEffect(() => {
     const container = containerRef.current
     if (!container || isMobile || lowPerf || prefersReducedMotion) return
@@ -123,7 +138,7 @@ export default function ShaderBackground({ children }: ShaderBackgroundProps) {
       if (ignore) return
       setIsActive(true)
       ignore = true
-      setTimeout(() => (ignore = false), 150)
+      setTimeout(() => (ignore = false), 150) // debounce hover enter
     }
     const onLeave = () => setIsActive(false)
 
@@ -135,41 +150,44 @@ export default function ShaderBackground({ children }: ShaderBackgroundProps) {
     }
   }, [isMobile, lowPerf, prefersReducedMotion])
 
-  // Keep colors unchanged
+  /** --- COLOR PALETTES (unchanged) --- */
   const layerAColors = ["#000000", "#333333", "#666666", "#999999", "#cccccc"]
   const layerBColors = ["#111111", "#444444", "#777777", "#aaaaaa"]
 
+  /** --- MOTION SPEEDS --- */
   const speedA = isMobile ? 0.1 : 0.3
   const speedB = isMobile ? 0.05 : 0.2
 
-  // render-scale wrapper styles
+  /** --- WRAPPER STYLES FOR RENDER SCALE --- */
   const wrapperStyle = {
     position: "absolute" as const,
     left: 0,
     top: 0,
-    width: `${100 * renderScale}%`,
+    width: `${100 * renderScale}%`,          // scale base canvas up
     height: `${100 * renderScale}%`,
-    transform: `scale(${1 / renderScale})`,
+    transform: `scale(${1 / renderScale})`,  // shrink back down
     transformOrigin: "top left",
     pointerEvents: "none" as const,
-    willChange: "transform, opacity",
+    willChange: "transform, opacity",        // hint GPU compositing
   }
 
+  /** --- CLASS FOR SHADER CONTAINERS --- */
   const shaderContainerClass = "absolute inset-0 w-full h-full transition-opacity duration-600 ease-out"
 
+  /** --- RENDER --- */
   return (
     <div
       ref={containerRef}
       className="min-h-screen relative overflow-hidden"
       style={{
-        // CSS fallback background so LCP paints immediately
+        // CSS fallback background ensures LCP paints immediately
         backgroundImage: `url("/fallback-bg.png")`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
       }}
     >
-      {/* minimal svg filter only when shaders actually mounted */}
+      {/* Minimal blur filter (applied only when shaders mount) */}
       {!lowPerf && shadersAllowed && (
         <svg className="absolute inset-0 w-0 h-0" aria-hidden>
           <defs>
@@ -180,18 +198,14 @@ export default function ShaderBackground({ children }: ShaderBackgroundProps) {
         </svg>
       )}
 
-      {/* Layer A: mounts only after fallback painted */}
+      {/* Layer A: lightweight, mounts first */}
       {shadersAllowed && !lowPerf && (
         <div style={wrapperStyle} aria-hidden className={shaderContainerClass + " z-10"}>
-          <MeshGradient
-            className="absolute inset-0 w-full h-full"
-            colors={layerAColors}
-            speed={speedA}
-          />
+          <MeshGradient className="absolute inset-0 w-full h-full" colors={layerAColors} speed={speedA} />
         </div>
       )}
 
-      {/* Layer B: heavy layer delayed and gated */}
+      {/* Layer B: heavier, delayed and gated */}
       {shadersAllowed && !lowPerf && enableLayerB && (
         <div style={wrapperStyle} aria-hidden className={shaderContainerClass + " z-20"}>
           <MeshGradient
@@ -202,10 +216,10 @@ export default function ShaderBackground({ children }: ShaderBackgroundProps) {
         </div>
       )}
 
-      {/* subtle overlay to reduce contrast */}
+      {/* Subtle overlay: reduces contrast across devices */}
       <div className={`absolute inset-0 z-25 pointer-events-none ${isMobile ? "bg-black/20" : "bg-black/10"}`} />
 
-      {/* content sits above everything; h1 will paint over CSS background early */}
+      {/* Foreground content (children always above background layers) */}
       <div className="relative z-30 w-full">{children}</div>
     </div>
   )

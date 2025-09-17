@@ -20,26 +20,26 @@ export function ServerPagination({
   currentPage,
   totalPages,
   onPageChange,
-  totalItems,
-  itemsPerPage,
 }: ServerPaginationProps) {
   const canPreviousPage = currentPage > 1;
   const canNextPage = currentPage < totalPages;
 
-  // Calculate which page numbers to show
+  // Returns a compact list of visible page numbers with "..." when ranges are skipped
   const getVisiblePages = () => {
-    const delta = 2; // Number of pages to show on each side of current page
-    const range = [];
-    const rangeWithDots = [];
+    const delta = 2;
+    const range: (number | string)[] = [];
+    const rangeWithDots: (number | string)[] = [];
 
-    for (let i = Math.max(2, currentPage - delta); 
-         i <= Math.min(totalPages - 1, currentPage + delta); 
-         i++) {
+    for (
+      let i = Math.max(2, currentPage - delta);
+      i <= Math.min(totalPages - 1, currentPage + delta);
+      i++
+    ) {
       range.push(i);
     }
 
     if (currentPage - delta > 2) {
-      rangeWithDots.push(1, '...');
+      rangeWithDots.push(1, "...");
     } else {
       rangeWithDots.push(1);
     }
@@ -47,7 +47,7 @@ export function ServerPagination({
     rangeWithDots.push(...range);
 
     if (currentPage + delta < totalPages - 1) {
-      rangeWithDots.push('...', totalPages);
+      rangeWithDots.push("...", totalPages);
     } else if (totalPages > 1) {
       rangeWithDots.push(totalPages);
     }
@@ -61,7 +61,6 @@ export function ServerPagination({
 
   return (
     <div className="flex items-center justify-between">
-      
       <Pagination>
         <PaginationContent>
           <PaginationItem>
@@ -69,9 +68,7 @@ export function ServerPagination({
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-                if (canPreviousPage) {
-                  onPageChange(currentPage - 1);
-                }
+                if (canPreviousPage) onPageChange(currentPage - 1);
               }}
               className={!canPreviousPage ? "pointer-events-none opacity-50" : ""}
             />
@@ -79,7 +76,7 @@ export function ServerPagination({
 
           {visiblePages.map((page, index) => (
             <PaginationItem key={index}>
-              {page === '...' ? (
+              {page === "..." ? (
                 <PaginationEllipsis />
               ) : (
                 <PaginationLink
@@ -101,9 +98,7 @@ export function ServerPagination({
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-                if (canNextPage) {
-                  onPageChange(currentPage + 1);
-                }
+                if (canNextPage) onPageChange(currentPage + 1);
               }}
               className={!canNextPage ? "pointer-events-none opacity-50" : ""}
             />

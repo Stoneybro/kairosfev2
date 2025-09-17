@@ -1,12 +1,20 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useWallets } from "@privy-io/react-auth";
 import { getSmartAccountClient } from "@/lib/smartAccountClient";
-import useCustomSmartAccount from "@/lib/customSmartAccount";
+import CustomSmartAccount from "@/lib/customSmartAccount";
 import type { SmartAccountClient } from "permissionless";
 
+// Context shape for smart account state
 type ContextValue = {
   client: SmartAccountClient | null;
   isInitializing: boolean;
@@ -22,16 +30,18 @@ export function SmartAccountProvider({ children }: { children: React.ReactNode }
   const embeddedWallet = wallets?.find((w) => w.walletClientType === "privy");
 
   const { initCustomAccount, isLoading: isCustomLoading, error: customError } =
-    useCustomSmartAccount();
+    CustomSmartAccount();
 
   const [client, setClient] = useState<SmartAccountClient | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  // refs for retries and backoff
   const initPromiseRef = useRef<Promise<SmartAccountClient | null> | null>(null);
   const retryTimerRef = useRef<number | null>(null);
-  const backoffRef = useRef<number>(1000); // start 1s, double on fail
+  const backoffRef = useRef<number>(1000); // start at 1s, double up to 1 min
 
+  // reset retry state
   const clearRetry = () => {
     if (retryTimerRef.current) {
       clearTimeout(retryTimerRef.current);
@@ -40,9 +50,9 @@ export function SmartAccountProvider({ children }: { children: React.ReactNode }
     backoffRef.current = 1000;
   };
 
+  // main initializer (idempotent with backoff retries)
   const initialize = useCallback(
     async (force = false): Promise<SmartAccountClient | null> => {
-      // avoid duplicate inits
       if (initPromiseRef.current && !force) return initPromiseRef.current;
 
       const promise = (async () => {
@@ -58,15 +68,14 @@ export function SmartAccountProvider({ children }: { children: React.ReactNode }
           return null;
         }
 
-        // If a valid client exists, return it (light validation)
+        // reuse client if valid
         if (client && !force) {
           try {
             if (client.account && typeof client.sendUserOperation === "function") {
               return client;
             }
           } catch {
-            // fall through to re-init
-            setClient(null);
+            setClient(null); // reset on failure
           }
         }
 
@@ -81,6 +90,7 @@ export function SmartAccountProvider({ children }: { children: React.ReactNode }
         } catch (err) {
           const thrown = err instanceof Error ? err : new Error(String(err));
           setError(thrown);
+
           // schedule retry with backoff
           clearRetry();
           const delay = backoffRef.current;
@@ -101,20 +111,18 @@ export function SmartAccountProvider({ children }: { children: React.ReactNode }
     [ready, authenticated, embeddedWallet, customError, client, initCustomAccount]
   );
 
-  // public getter that throws if client is unavailable
+  // getter for client, throws if unavailable
   const getClient = useCallback(async (): Promise<SmartAccountClient> => {
     const c = await initialize();
     if (!c) throw new Error("Smart account client not available. Reconnect or try again.");
     return c;
   }, [initialize]);
 
-  // initialize on mount when auth ready
+  // init when auth/wallet ready
   useEffect(() => {
-    // only attempt if auth/wallet ready
     if (ready && authenticated && embeddedWallet) {
       initialize().catch(() => {});
     } else {
-      // clear client if user logged out or wallet changed
       setClient(null);
       setError(null);
       clearRetry();
@@ -122,7 +130,7 @@ export function SmartAccountProvider({ children }: { children: React.ReactNode }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, authenticated, embeddedWallet?.address]);
 
-  // re-attempt init on window focus (handles idle sessions)
+  // retry init when window regains focus
   useEffect(() => {
     const onFocus = () => {
       if (!client && ready && authenticated && embeddedWallet) {
@@ -157,6 +165,7 @@ export function SmartAccountProvider({ children }: { children: React.ReactNode }
   );
 }
 
+// hook for accessing smart account context
 export function useSmartAccountContext() {
   const ctx = useContext(SmartAccountContext);
   if (!ctx) throw new Error("useSmartAccountContext must be used inside SmartAccountProvider");

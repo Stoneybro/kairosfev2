@@ -1,12 +1,4 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { useLogin } from "@privy-io/react-auth";
-import { FcGoogle } from "react-icons/fc";
-import { SiGmail } from "react-icons/si";
-import { IoWallet } from "react-icons/io5";
-import { FaGithub } from "react-icons/fa";
-import SvgLoading from "../ui/spinner";
-import { usePrivy } from "@privy-io/react-auth";
 import { Skeleton } from "../ui/skeleton";
 export default function LoginFormSkeleton() {
   return (

@@ -1,6 +1,5 @@
 "use client";
 import { ArrowUpDown, QrCode } from "lucide-react";
-import { CiMoneyCheck1 } from "react-icons/ci";
 import React from "react";
 import { Button } from "../ui/button";
 import { activeTabType } from "@/types";
@@ -58,7 +57,7 @@ export default function WalletHome({
             {walletDataIsLoading ? (
               <Skeleton className='h-8 w-16' />
             ) : (
-              `${walletData?.commitedFunds} ETH`
+              `${walletData?.committedFunds} ETH`
             )}
           </span>
         </div>

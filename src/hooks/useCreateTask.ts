@@ -3,6 +3,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { encodeFunctionData } from "viem";
 import { SMART_ACCOUNT_ABI } from "@/lib/contracts/contracts";
 import { useSmartAccountContext } from "@/lib/smartAccountProvider";
+
+// Input shape for creating a task
 type CreateTaskArgsType = {
   taskTitle: string;
   taskDescription: string;
@@ -14,13 +16,17 @@ type CreateTaskArgsType = {
   delayPayment?: bigint;
 };
 
+// Hook to create a new task 
 export function useCreateTask(smartAccount: `0x${string}`) {
   const { getClient } = useSmartAccountContext();
   const qc = useQueryClient();
+
   return useMutation({
+    // Send "createTask" userOp
     mutationFn: async (payLoad: CreateTaskArgsType) => {
       const client = await getClient();
       if (!client) throw new Error("Smart account not initialized");
+
       const callData = encodeFunctionData({
         abi: SMART_ACCOUNT_ABI,
         functionName: "createTask",
@@ -46,20 +52,26 @@ export function useCreateTask(smartAccount: `0x${string}`) {
           },
         ],
       });
+
       const receipt = await client.waitForUserOperationReceipt({ hash });
       return { hash, receipt };
     },
-    onSuccess: (data, payLoad) => {
+
+    // Refresh queries on success
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["tasks", smartAccount] });
       qc.invalidateQueries({ queryKey: ["dashboardBalance", smartAccount] });
       qc.invalidateQueries({ queryKey: ["taskCount", smartAccount] });
       qc.invalidateQueries({ queryKey: ["wallet-activity", smartAccount] });
-      
     },
-    onError: (err, payLoad, context: any) => {
+
+    // Log errors
+    onError: (err) => {
       console.log(err);
     },
-    onSettled: (_data, payLoad) => {
+
+    // Always re-fetch tasks
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ["tasks", smartAccount] });
     },
   });

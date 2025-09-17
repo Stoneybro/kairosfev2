@@ -4,18 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import TableNav from "./nav";
 import { TableSkeleton } from "./tableSkeleton";
-import {
-  fetchTasks,
-  fetchTasksCount,
-  formatDate,
-  formatNumber,
-  slugify,
-} from "@/utils/helpers";
+import { fetchTasks, fetchTasksCount } from "@/utils/helpers";
+import { slugify, formatDate, formatNumber } from "@/utils/format";
 import Createtaskbutton from "../tasks/create-task-button";
 import { DataTable } from "./data-table";
 import { columns } from "./column";
-import { TASK_STATUS_MAP, TaskType } from "@/types";
-import { TabKey } from "@/types";
+import { TaskType, TabKey } from "@/types";
+import { TASK_STATUS_MAP } from "@/utils/constants";
 
 export function TaskTableWrapper({
   smartAccount,
@@ -30,6 +25,8 @@ export function TaskTableWrapper({
   });
   const [activeTab, setActiveTab] = useState<TabKey>("Active tasks");
   const limit = 7;
+
+  // Fetch total count of tasks per status
   const {
     data: taskCount,
     isLoading: taskCountIsLoading,
@@ -40,17 +37,13 @@ export function TaskTableWrapper({
     refetchOnWindowFocus: false,
     staleTime: Infinity,
   });
-  // Build one query per status
+
+  // One query per task status (active, completed, canceled, expired)
   const queries = {
     active: useQuery({
       queryKey: ["tasks", smartAccount, "active", page.active],
       queryFn: () =>
-        fetchTasks(
-          smartAccount as `0x${string}`,
-          0,
-          (page.active - 1) * limit,
-          limit
-        ),
+        fetchTasks(smartAccount as `0x${string}`, 0, (page.active - 1) * limit, limit),
       enabled: !!smartAccount,
       staleTime: Infinity,
       refetchOnWindowFocus: false,
@@ -58,42 +51,27 @@ export function TaskTableWrapper({
     completed: useQuery({
       queryKey: ["tasks", smartAccount, "completed", page.completed],
       queryFn: () =>
-        fetchTasks(
-          smartAccount as `0x${string}`,
-          1,
-          (page.completed - 1) * limit,
-          limit
-        ),
+        fetchTasks(smartAccount as `0x${string}`, 1, (page.completed - 1) * limit, limit),
       enabled: !!smartAccount,
       staleTime: Infinity,
     }),
     canceled: useQuery({
       queryKey: ["tasks", smartAccount, "canceled", page.canceled],
       queryFn: () =>
-        fetchTasks(
-          smartAccount as `0x${string}`,
-          2,
-          (page.canceled - 1) * limit,
-          limit
-        ),
+        fetchTasks(smartAccount as `0x${string}`, 2, (page.canceled - 1) * limit, limit),
       enabled: !!smartAccount,
       staleTime: Infinity,
     }),
     expired: useQuery({
       queryKey: ["tasks", smartAccount, "expired", page.expired],
       queryFn: () =>
-        fetchTasks(
-          smartAccount as `0x${string}`,
-          3,
-          (page.expired - 1) * limit,
-          limit
-        ),
+        fetchTasks(smartAccount as `0x${string}`, 3, (page.expired - 1) * limit, limit),
       enabled: !!smartAccount,
       staleTime: Infinity,
     }),
   };
 
-  // Pick which dataset/error/loading state to show based on active tab
+  // Select active query dataset based on current tab
   const activeQuery = useMemo(() => {
     switch (activeTab) {
       case "Active tasks":
@@ -109,24 +87,16 @@ export function TaskTableWrapper({
     }
   }, [activeTab, queries]);
 
-  if (!smartAccount) {
-    return <TableSkeleton error />;
-  }
-
-  if (activeQuery.isLoading && taskCountIsLoading) {
-    return <TableSkeleton />;
-  }
-
-  if (activeQuery.error && taskCountError) {
-    return <TableSkeleton error />;
-  }
+  if (!smartAccount) return <TableSkeleton error />;
+  if (activeQuery.isLoading && taskCountIsLoading) return <TableSkeleton />;
+  if (activeQuery.error && taskCountError) return <TableSkeleton error />;
 
   const task = activeQuery.data;
   const statusCount = taskCount?.[TASK_STATUS_MAP[activeTab]] ?? 0;
 
   return (
-    <div className='flex flex-col gap-8' id="tour-tasks">
-      <div className='flex justify-between items-center'>
+    <div className="flex flex-col gap-8" id="tour-tasks">
+      <div className="flex justify-between items-center">
         <TableNav
           activeTab={activeTab}
           setActiveTab={setActiveTab}

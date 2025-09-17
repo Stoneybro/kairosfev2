@@ -1,4 +1,3 @@
-// lib/web3/hooks/usePrivyAccount.ts
 "use client";
 import { useWallets } from "@privy-io/react-auth";
 

@@ -17,20 +17,24 @@ import LoaderButton from "../ui/loaderButton";
 import { toast } from "sonner";
 
 export default function WalletSettings() {
+
   const { ready, authenticated, logout } = usePrivy();
   const router = useRouter();
+
   const disabled = !ready || (ready && !authenticated);
+
+  // Handles full logout (Privy + session + storage + cookies)
   async function handleLogout() {
     try {
-      await logout();
-       await fetch("/api/session/logout", { method: "POST" });
-      localStorage.clear();
+      await logout(); 
+      await fetch("/api/session/logout", { method: "POST" }); 
+      localStorage.clear(); 
       document.cookie.split(";").forEach((c) => {
         document.cookie = c
           .replace(/^ +/, "")
           .replace(/=.*/, `=;expires=${new Date(0).toUTCString()};path=/`);
       });
-      router.push("/");
+      router.push("/"); 
       return true;
     } catch (error) {
       console.log("logout error", error);
@@ -38,14 +42,18 @@ export default function WalletSettings() {
       return false;
     }
   }
+
   return (
-    <div className='flex flex-col  h-full w-full p-4'>
-      <div className=' text-2xl font-semibold flex justify-start'>
-        <div className=''> Settings</div>
+    <div className='flex flex-col h-full w-full p-4'>
+      {/* Header */}
+      <div className='text-2xl font-semibold flex justify-start'>
+        <div>Settings</div>
       </div>
+
       <div className='flex flex-col gap-4'>
-        <div className='flex flex-col gap-2 mt-4 '>
-          <div className=''>Chain</div>
+        {/* Chain selector */}
+        <div className='flex flex-col gap-2 mt-4'>
+          <div>Chain</div>
           <Select>
             <SelectTrigger>
               <SelectValue placeholder='Base sepolia' />
@@ -58,14 +66,16 @@ export default function WalletSettings() {
             </SelectContent>
           </Select>
         </div>
+
+        {/* Logout button */}
         <LoaderButton
-        executeAction={handleLogout}
-        idleText="LogOut"
-        loadingText="Logging Out"
-        successText="Logged Out"
-        disabled={disabled}
-        variant="destructive"
-        className=' w-[135px]'
+          executeAction={handleLogout}
+          idleText="LogOut"
+          loadingText="Logging Out"
+          successText="Logged Out"
+          disabled={disabled}
+          variant="destructive"
+          className='w-[135px]'
         />
       </div>
     </div>

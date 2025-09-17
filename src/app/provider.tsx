@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { privyConfig } from "@/lib/privyConfig";

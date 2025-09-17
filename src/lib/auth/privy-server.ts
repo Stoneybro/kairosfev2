@@ -1,11 +1,13 @@
-//lib/auth/privyserver.ts
-
 import { PrivyClient } from "@privy-io/server-auth";
 import { cookies } from "next/headers";
+
+// Initialize Privy client with app credentials
 export const privyClient = new PrivyClient(
   process.env.NEXT_PRIVY_APP_ID!,
   process.env.NEXT_PRIVY_APP_SECRET!
 );
+
+// Verify a given auth token with Privy
 export async function verifyToken(token?: string | null) {
   if (!token) return null;
   try {
@@ -15,9 +17,11 @@ export async function verifyToken(token?: string | null) {
     return null;
   }
 }
+
+// Verify token stored in request cookies
 export async function privyVerify() {
-  const store =await cookies();
+  const store = await cookies();
   const token = store.get("privy-token")?.value;
   if (!token) return null;
-return verifyToken(token)
+  return verifyToken(token);
 }

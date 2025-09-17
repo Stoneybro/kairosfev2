@@ -1,17 +1,15 @@
-// lib/web3/clients.ts
 import { createPublicClient, createWalletClient, http, custom } from "viem";
 import { baseSepolia } from "viem/chains";
 
-
-
+// Public client: used for read-only blockchain interactions
 export const getPublicClient = () =>
   createPublicClient({ chain: baseSepolia, transport: http() });
 
+// Wallet client: used for signed transactions via a connected wallet
 export const getWalletClient = async ({
   address,
   eip1193,
 }: {
-  chainId: number;
   address: `0x${string}`;
   eip1193: any;
 }) =>

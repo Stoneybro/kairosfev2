@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { activateWallet } from "@/hooks/useActivateWallet";
+import { useActivateWallet } from "@/hooks/useActivateWallet";
 import { Label } from "@radix-ui/react-label";
 import { Checkbox } from "@/components/ui/checkbox";
 import LoadingButton from "@/components/ui/loaderButton";
@@ -18,7 +18,7 @@ function page() {
   const [isActivating, setIsActivating] = useState(false); // Add isActivating state
   const router = useRouter();
   const queryClient = useQueryClient();
-  const handleActivateWallet = activateWallet();
+  const handleActivateWallet = useActivateWallet();
   const { ready, authenticated, user } = usePrivy();
 
   useEffect(() => {

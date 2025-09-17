@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PenaltyType } from "@/types";
+import { PenaltyType } from "@/utils/constants";
 import { parseEther } from "viem";
 import { fetchDashboardBalance } from "@/utils/helpers";
 import { useQuery } from "@tanstack/react-query";
@@ -16,6 +16,10 @@ import { useCreateTask } from "@/hooks/useCreateTask";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import LoaderButton from "@/components/ui/loaderButton";
+
+/* ---------------- Schema ---------------- */
+// Schema is dynamic because it validates against wallet balance.
+// Also enforces cross-field rules (future deadline, valid penalty inputs).
 function createSchema(availableBalance?: string) {
   return z
     .object({
@@ -29,46 +33,24 @@ function createSchema(availableBalance?: string) {
         .refine((v) => Number(v) > 0, "Reward must be > 0"),
       deadline: z.instanceof(Date).nullable(),
       verificationMethod: z.number().refine((v) => /^[0-2]$/.test(String(v)), {
-        message: "Verification method must be Manual,Partner or AI",
+        message: "Verification method must be Manual, Partner or AI",
       }),
       penaltyType: z.nativeEnum(PenaltyType),
-      delayDays: z
-        .string()
-        .optional()
-        .refine(
-          (v) =>
-            v === undefined ||
-            v === "" ||
-            (!isNaN(Number(v)) && Number(v) >= 0),
-          {
-            message: "Invalid days",
-          }
-        ),
-      delayHours: z
-        .string()
-        .optional()
-        .refine(
-          (v) =>
-            v === undefined ||
-            v === "" ||
-            (!isNaN(Number(v)) && Number(v) >= 0 && Number(v) <= 23),
-          {
-            message: "Invalid hours",
-          }
-        ),
+      delayDays: z.string().optional(),
+      delayHours: z.string().optional(),
       buddyAddress: z
         .string()
         .optional()
-        .refine((v) => {
-          if (!v) return true;
-          return /^0x[a-fA-F0-9]{40}$/.test(v);
-        }, "Invalid Ethereum address"),
+        .refine(
+          (v) => !v || /^0x[a-fA-F0-9]{40}$/.test(v),
+          "Invalid Ethereum address"
+        ),
     })
     .superRefine((vals, ctx) => {
-      // 1) reward <= available balance
+      // Reward cannot exceed wallet balance
       if (vals.rewardEth) {
         try {
-          const rewardWei = parseEther(vals.rewardEth); // bigint
+          const rewardWei = parseEther(vals.rewardEth);
           const availWei = availableBalance
             ? parseEther(String(availableBalance))
             : 0n;
@@ -88,7 +70,7 @@ function createSchema(availableBalance?: string) {
         }
       }
 
-      // 2) deadline must be in future (if provided)
+      // Deadline must be in the future
       if (vals.deadline) {
         const nowSec = Math.floor(Date.now() / 1000);
         const deadlineSec = Math.floor(vals.deadline.getTime() / 1000);
@@ -101,7 +83,7 @@ function createSchema(availableBalance?: string) {
         }
       }
 
-      // 3) chosen penalty input must be filled
+      // Penalty-specific validation
       if (vals.penaltyType === PenaltyType.DELAY_PAYMENT) {
         const days = vals.delayDays?.trim() ?? "";
         const hours = vals.delayHours?.trim() ?? "";
@@ -127,28 +109,29 @@ function createSchema(availableBalance?: string) {
       }
 
       if (vals.penaltyType === PenaltyType.SEND_BUDDY) {
-        const addr = vals.buddyAddress ?? "";
-        if (!addr || !/^0x[a-fA-F0-9]{40}$/.test(addr)) {
+        if (!vals.buddyAddress) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["buddyAddress"],
-            message: "Buddy address is required and must be a valid address.",
+            message: "Buddy address is required.",
           });
         }
       }
     });
 }
 
-/* ---------- Form component ---------- */
-
 type FormValues = z.infer<ReturnType<typeof createSchema>>;
+
+/* ---------------- Form ---------------- */
 
 export default function CreateTaskForm({
   smartAccount,
 }: {
   smartAccount?: `0x${string}`;
 }) {
-  const router=useRouter()
+  const router = useRouter();
+
+  // Query wallet balance for reward validation
   const { data: cardData, isLoading: cardDataIsLoading } = useQuery({
     queryKey: ["dashboardBalance", smartAccount],
     queryFn: () => fetchDashboardBalance(smartAccount as `0x${string}`),
@@ -158,11 +141,12 @@ export default function CreateTaskForm({
     staleTime: Infinity,
   });
 
-  // build schema with the latest availableBalance
+  // Rebuild schema whenever balance changes
   const schema = useMemo(
     () => createSchema(cardData?.availableBalance),
     [cardData?.availableBalance]
   );
+
   const createTask = useCreateTask(smartAccount as `0x${string}`);
   const {
     register,
@@ -188,21 +172,25 @@ export default function CreateTaskForm({
 
   const penaltyType = watch("penaltyType");
 
+  // Transform + submit payload
   async function handleCreate(values: FormValues) {
-    if (!isValid) return false; 
+    if (!isValid) return false;
+
     const delaySeconds =
       values.delayDays || values.delayHours
         ? Number(values.delayDays || 0) * 24 * 3600 +
           Number(values.delayHours || 0) * 3600
         : 0;
+
     const nowSec = Math.floor(Date.now() / 1000);
+
     const payload = {
-      taskTitle:values.title,
+      taskTitle: values.title,
       taskDescription: values.description,
       rewardAmount: parseEther(values.rewardEth),
       deadlineInSeconds: values.deadline
         ? BigInt(Math.floor(values.deadline.getTime() / 1000) - nowSec)
-        : 3600n, 
+        : 3600n, // fallback deadline = 1h
       penaltyChoice: values.penaltyType === PenaltyType.DELAY_PAYMENT ? 1 : 2,
       verificationMethod: values.verificationMethod,
       delayPayment: BigInt(delaySeconds),
@@ -213,9 +201,9 @@ export default function CreateTaskForm({
 
     try {
       await createTask.mutateAsync(payload);
-      toast.success("Task Created Succesfully");
+      toast.success("Task Created Successfully");
       reset();
-      router.push("/dashboard")
+      router.push("/dashboard");
       return true;
     } catch (err) {
       console.error("create task failed", err);
@@ -224,15 +212,17 @@ export default function CreateTaskForm({
     }
   }
 
+  /* ---------------- UI ---------------- */
+
   return (
     <form className='max-w-xl'>
       <div className='flex flex-col gap-4 w-full'>
         <div className='text-3xl'>Create Task</div>
 
-        {/* title */}
+        {/* Title */}
         <div>
           <label className='text-sm text-muted-foreground'>Task title</label>
-          <Input {...register("title")} placeholder='' required />
+          <Input {...register("title")} required />
           {errors.title && (
             <div className='text-sm mt-1 text-red-500'>
               {errors.title.message}
@@ -240,12 +230,12 @@ export default function CreateTaskForm({
           )}
         </div>
 
-        {/* description */}
+        {/* Description */}
         <div>
           <label className='text-sm text-muted-foreground'>
             Task Description
           </label>
-          <Input {...register("description")} placeholder='' required />
+          <Input {...register("description")} required />
           {errors.description && (
             <div className='text-sm mt-1 text-red-500'>
               {errors.description.message}
@@ -253,7 +243,7 @@ export default function CreateTaskForm({
           )}
         </div>
 
-        {/* reward */}
+        {/* Reward */}
         <div>
           <label className='text-sm text-muted-foreground'>
             Reward Amount (ETH)
@@ -279,179 +269,164 @@ export default function CreateTaskForm({
           )}
         </div>
 
-        {/* Controlled DatePicker (single Date value) */}
-        <div>
-          <Controller
-            control={control}
-            name='deadline'
-            render={({ field: { value, onChange } }) => (
-              <DatePicker
-                value={value ?? null}
-                onChange={(d) => onChange(d ?? null)}
-              />
-            )}
-          />
-          {errors.deadline && (
-            <div className='text-sm text-red-500'>
-              {errors.deadline.message}
-            </div>
+        {/* Deadline */}
+        <Controller
+          control={control}
+          name='deadline'
+          render={({ field: { value, onChange } }) => (
+            <DatePicker
+              value={value ?? null}
+              onChange={(d) => onChange(d ?? null)}
+            />
           )}
-        </div>
+        />
+        {errors.deadline && (
+          <div className='text-sm text-red-500'>{errors.deadline.message}</div>
+        )}
+
         {/* Verification Method */}
         <Controller
           control={control}
           name='verificationMethod'
           render={({ field: { value, onChange } }) => (
-            <div className=''>
-              <RadioGroup
-                value={String(value)}
-                onValueChange={(vm) => onChange(vm)}
+            <RadioGroup
+              value={String(value)}
+              onValueChange={(vm) => onChange(vm)}
+            >
+              <div className='text-muted-foreground text-sm'>
+                Verification Method
+              </div>
+              <label
+                htmlFor='r1'
+                className='flex items-center gap-1 text-muted-foreground text-sm'
               >
-                <div className='text-muted-foreground text-sm'>
-                  Verification Method
-                </div>
-                <div className='flex items-center gap-1 text-muted-foreground text-sm'>
-                  <label htmlFor='r1'>
-                    <RadioGroupItem value='0' id='r1' /> Manual
-                  </label>
-                </div>
-                <div className='flex items-center gap-1 text-muted-foreground/50 text-sm'>
-                  <label htmlFor='r2'>
-                    <RadioGroupItem value='1' id='r2' disabled />
-                    Accountability partner
-                  </label>
-                </div>
-                <div className='flex items-center gap-1 text-muted-foreground/50 text-sm'>
-                  <label htmlFor='r3'>
-                    <RadioGroupItem value='2' id='r3' disabled /> A.I.
-                    Verification
-                  </label>
-                </div>
-              </RadioGroup>
-            </div>
+                <RadioGroupItem value='0' id='r1' /> Manual
+              </label>
+              <label
+                htmlFor='r2'
+                className='flex items-center gap-1 text-muted-foreground/50 text-sm'
+              >
+                <RadioGroupItem value='1' id='r2' disabled /> Accountability
+                partner
+              </label>
+              <label
+                htmlFor='r3'
+                className='flex items-center gap-1 text-muted-foreground/50 text-sm'
+              >
+                <RadioGroupItem value='2' id='r3' disabled /> A.I. Verification
+              </label>
+            </RadioGroup>
           )}
         />
 
-        {/* Penalty */}
-        <div className='max-w-md'>
-          <div className='grid gap-2'>
-            <label className='text-muted-foreground text-sm'>
-              Penalty Type
-            </label>
-
-            <Controller
-              control={control}
-              name='penaltyType'
-              render={({ field: { value, onChange } }) => (
-                <div className='flex items-center justify-between'>
-                  <RadioGroup
-                    value={value}
-                    onValueChange={(v) => onChange(v as PenaltyType)}
-                    className='flex gap-3 w-full'
-                  >
-                    <label
-                      className={`flex p-2 w-[48%] gap-3 border rounded-2xl items-center cursor-pointer transition ${
-                        value === PenaltyType.DELAY_PAYMENT
-                          ? "bg-muted border-muted-foreground/50"
-                          : ""
-                      }`}
-                    >
-                      <RadioGroupItem
-                        value={PenaltyType.DELAY_PAYMENT}
-                        id='DELAY_PAYMENT'
-                      />
-                      <div className='flex flex-col'>
-                        <span>Delay Payment</span>
-                        <span className='text-sm text-muted-foreground'>
-                          Delay payment by specified time.
-                        </span>
-                      </div>
-                    </label>
-
-                    <label
-                      className={`flex p-2 w-[48%] gap-3 border rounded-2xl items-center cursor-pointer ${
-                        value === PenaltyType.SEND_BUDDY
-                          ? "bg-muted border-muted-foreground/50"
-                          : ""
-                      }`}
-                    >
-                      <RadioGroupItem
-                        value={PenaltyType.SEND_BUDDY}
-                        id='SEND_BUDDY'
-                      />
-                      <div className='flex flex-col'>
-                        <span>Send Buddy</span>
-                        <span className='text-sm text-muted-foreground'>
-                          Send to specified address.
-                        </span>
-                      </div>
-                    </label>
-                  </RadioGroup>
+        {/* Penalty Type */}
+        <Controller
+          control={control}
+          name='penaltyType'
+          render={({ field: { value, onChange } }) => (
+            <RadioGroup
+              value={value}
+              onValueChange={(v) => onChange(v as PenaltyType)}
+              className='flex gap-3 w-full'
+            >
+              <label
+                className={`flex p-2 w-[48%] gap-3 border rounded-2xl items-center cursor-pointer ${
+                  value === PenaltyType.DELAY_PAYMENT
+                    ? "bg-muted border-muted-foreground/50"
+                    : ""
+                }`}
+              >
+                <RadioGroupItem
+                  value={PenaltyType.DELAY_PAYMENT}
+                  id='DELAY_PAYMENT'
+                />
+                <div className='flex flex-col'>
+                  <span>Delay Payment</span>
+                  <span className='text-sm text-muted-foreground'>
+                    Delay payment by specified time.
+                  </span>
                 </div>
-              )}
-            />
+              </label>
+              <label
+                className={`flex p-2 w-[48%] gap-3 border rounded-2xl items-center cursor-pointer ${
+                  value === PenaltyType.SEND_BUDDY
+                    ? "bg-muted border-muted-foreground/50"
+                    : ""
+                }`}
+              >
+                <RadioGroupItem
+                  value={PenaltyType.SEND_BUDDY}
+                  id='SEND_BUDDY'
+                />
+                <div className='flex flex-col'>
+                  <span>Send Buddy</span>
+                  <span className='text-sm text-muted-foreground'>
+                    Send to specified address.
+                  </span>
+                </div>
+              </label>
+            </RadioGroup>
+          )}
+        />
+
+        {/* Penalty Inputs */}
+        {penaltyType === PenaltyType.DELAY_PAYMENT && (
+          <div>
+            <div className='text-muted-foreground text-sm mb-1'>
+              Delay Duration
+            </div>
+            <div className='flex gap-3'>
+              <Input
+                type='number'
+                {...register("delayDays")}
+                placeholder='days'
+                min={0}
+                max={365}
+                className='flex-1'
+              />
+              <Input
+                type='number'
+                {...register("delayHours")}
+                placeholder='hours'
+                min={0}
+                max={23}
+                className='flex-1'
+              />
+            </div>
+            {(errors.delayDays || errors.delayHours) && (
+              <div className='text-sm text-red-500'>
+                {errors.delayDays?.message ?? errors.delayHours?.message}
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
-        {/* Penalty inputs */}
-        <div>
-          {penaltyType === PenaltyType.DELAY_PAYMENT && (
-            <div>
-              <div className='text-muted-foreground text-sm mb-1'>
-                Delay Duration
-              </div>
-              <div className='flex gap-3'>
-                <Input
-                  type='number'
-                  {...register("delayDays")}
-                  placeholder='days'
-                  min={0}
-                  max={365}
-                  className='flex-1'
-                />
-                <Input
-                  type='number'
-                  {...register("delayHours")}
-                  placeholder='hours'
-                  min={0}
-                  max={23}
-                  className='flex-1'
-                />
-              </div>
-              {(errors.delayDays || errors.delayHours) && (
-                <div className='text-sm text-red-500'>
-                  {errors.delayDays?.message ?? errors.delayHours?.message}
-                </div>
-              )}
+        {penaltyType === PenaltyType.SEND_BUDDY && (
+          <div>
+            <div className='text-muted-foreground text-sm mb-1'>
+              Buddy's Address
             </div>
-          )}
-
-          {penaltyType === PenaltyType.SEND_BUDDY && (
-            <div>
-              <div className='text-muted-foreground text-sm mb-1'>
-                Buddy's Address
+            <Input {...register("buddyAddress")} placeholder='0x...' />
+            {errors.buddyAddress && (
+              <div className='text-sm text-red-500'>
+                {errors.buddyAddress.message}
               </div>
-              <Input {...register("buddyAddress")} placeholder='0x...' />
-              {errors.buddyAddress && (
-                <div className='text-sm text-red-500'>
-                  {errors.buddyAddress.message}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
+        {/* Submit */}
         <LoaderButton
           className='w-full'
           idleText='Create Task'
           loadingText='Creating...'
           successText='Task Created!'
-          disabled={ isSubmitting}
+          disabled={isSubmitting}
           timeoutMs={60000}
           executeAction={async () => {
             let success = false;
             await handleSubmit(async (values) => {
-              success = await handleCreate(values); 
+              success = await handleCreate(values);
             })();
             return success;
           }}

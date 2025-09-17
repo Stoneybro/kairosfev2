@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { checkFaucetStatus } from "@/utils/helpers";
 import useFaucetClaim from "@/hooks/useFaucetClaim";
 import LoadingButton from "../ui/loaderButton";
@@ -7,22 +7,25 @@ import { usePrivy } from "@privy-io/react-auth";
 function WalletFaucet({ smartAccount }: { smartAccount: `0x${string}` }) {
   const [funded, setFunded] = useState(false);
   const { authenticated } = usePrivy();
-  const faucetClaim=useFaucetClaim(smartAccount)
+  const faucetClaim = useFaucetClaim(smartAccount);
+
+  // Trigger faucet claim
   async function handleFaucetClaim() {
     try {
-      const success = await faucetClaim(); // assuming it returns a boolean/hash
+      const success = await faucetClaim();
       if (success) {
         setFunded(true);
         localStorage.setItem("faucetStatus", "true");
       }
-      return true
+      return true;
     } catch (e) {
       console.error("Faucet claim failed", e);
-      return false
+      return false;
     }
   }
 
   useEffect(() => {
+    // Check if faucet already claimed (localStorage first, then on-chain)
     const claimCheck = localStorage.getItem("faucetStatus");
     if (claimCheck === "true") {
       setFunded(true);
@@ -32,28 +35,22 @@ function WalletFaucet({ smartAccount }: { smartAccount: `0x${string}` }) {
     const checkStatus = async () => {
       try {
         const result = await checkFaucetStatus(smartAccount);
-        console.log("results", result);
-
         if (result) {
           localStorage.setItem("faucetStatus", "true");
           setFunded(true);
         }
-      } catch (error) {
-        console.error("Error checking faucet status:", error);
+      } catch (err) {
+        console.error("Error checking faucet status:", err);
       }
     };
 
-    if (authenticated && smartAccount) {
-      checkStatus();
-    }
+    if (authenticated && smartAccount) checkStatus();
   }, [smartAccount, authenticated]);
 
-  if (!authenticated) {
-    return;
-  }
+  if (!authenticated) return null;
 
   return (
-    <div id="tour-claim-faucet-btn">
+    <div id='tour-claim-faucet-btn'>
       {!funded && (
         <LoadingButton
           executeAction={handleFaucetClaim}
@@ -62,7 +59,6 @@ function WalletFaucet({ smartAccount }: { smartAccount: `0x${string}` }) {
           successText='claimed'
           variant='ghost'
           className='text-sm'
-
         />
       )}
     </div>

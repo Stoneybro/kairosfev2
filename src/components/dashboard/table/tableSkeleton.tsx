@@ -22,10 +22,9 @@ type TableSkeletonProps = {
 };
 
 export function TableSkeleton({ error, noData }: TableSkeletonProps) {
-  // create a table instance only with columns, no data
   const table = useReactTable({
     columns,
-    data: [], // no data here
+    data: [], 
     getCoreRowModel: getCoreRowModel(),
   });
 

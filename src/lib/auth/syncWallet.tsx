@@ -1,11 +1,11 @@
-// lib/auth/syncWallet.ts
 "use client";
 import { useEffect } from "react";
 import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import SvgLoading from "../../components/ui/spinner";
 
+
+// Send wallet address + auth token to server for session sync
 async function doFetch(
   body: { walletAddress: string },
   token: string,
@@ -25,9 +25,12 @@ async function doFetch(
   });
 }
 
+// Sync wallet with server, retry if token is stale
 async function syncWalletOnServer(walletAddr: string, signal?: AbortSignal) {
   const token = (await getAccessToken?.()) ?? "";
   let res = await doFetch({ walletAddress: walletAddr }, token, signal);
+
+  // Refresh token if backend signals grace period
   if (res.headers.get("x-auth-grace") === "1") {
     try {
       await getAccessToken?.(); // force refresh
@@ -47,16 +50,18 @@ interface SyncWalletAfterLoginProps {
   isActivating?: boolean;
 }
 
+// Handles wallet sync after login and redirects based on activation state
 export default function SyncWalletAfterLogin({ isActivating = false }: SyncWalletAfterLoginProps) {
-  const { ready, user, authenticated, login } = usePrivy();
+  const { ready, user, authenticated } = usePrivy();
   const router = useRouter();
   const queryClient = useQueryClient();
   const wallet = user?.wallet?.address;
 
+  // Query to sync wallet session with server
   const query = useQuery({
     queryKey: ["sync-session", wallet],
     queryFn: ({ signal }) => syncWalletOnServer(wallet as string, signal),
-    enabled: Boolean(ready && authenticated && wallet && !isActivating), // Disable query during activation
+    enabled: Boolean(ready && authenticated && wallet && !isActivating), // disable during activation
     refetchOnWindowFocus: false,
     refetchInterval: 4 * 60 * 1000,
     refetchOnReconnect: false,
@@ -64,42 +69,35 @@ export default function SyncWalletAfterLogin({ isActivating = false }: SyncWalle
     retry: 1,
   });
 
+  // Refetch session when tab becomes visible
   useEffect(() => {
     const onVisibility = async () => {
       if (document.visibilityState !== "visible") return;
       try {
         await getAccessToken?.();
-        await queryClient.refetchQueries({
-          queryKey: ["sync-session", wallet],
-        });
+        await queryClient.refetchQueries({ queryKey: ["sync-session", wallet] });
       } catch {}
     };
     document.addEventListener("visibilitychange", onVisibility);
     return () => document.removeEventListener("visibilitychange", onVisibility);
   }, [queryClient, wallet]);
 
-  // Network reconnect handler
+  // Refetch session on network reconnect
   useEffect(() => {
     const onOnline = async () => {
       try {
         await getAccessToken?.();
-        await queryClient.refetchQueries({
-          queryKey: ["sync-session", wallet],
-        });
+        await queryClient.refetchQueries({ queryKey: ["sync-session", wallet] });
       } catch {}
     };
     window.addEventListener("online", onOnline);
     return () => window.removeEventListener("online", onOnline);
   }, [queryClient, wallet]);
 
+  // Redirect user based on sync result
   useEffect(() => {
-    // Skip navigation logic if currently activating wallet
-    if (!query.isFetched || isActivating) {
-      return;
-    }
-    
+    if (!query.isFetched || isActivating) return;
 
-    
     (async () => {
       if (query.isError) {
         try {
@@ -108,11 +106,8 @@ export default function SyncWalletAfterLogin({ isActivating = false }: SyncWalle
             await query.refetch();
             return;
           }
-        } catch (e) {}
-        // Only redirect to login if we're not in the middle of activation
-        if (!isActivating) {
-          router.replace("/login");
-        }
+        } catch {}
+        if (!isActivating) router.replace("/login");
         return;
       }
 
@@ -120,15 +115,11 @@ export default function SyncWalletAfterLogin({ isActivating = false }: SyncWalle
       if (data?.activated) {
         router.push("/dashboard");
       } else if (data?.ok && !data?.activated) {
-        // Only redirect to activate wallet if we're not already there
         if (window.location.pathname !== "/activatewallet") {
           router.push("/activatewallet");
         }
       } else {
-        // Only redirect to login if we're not in the middle of activation
-        if (!isActivating) {
-          router.replace("/login");
-        }
+        if (!isActivating) router.replace("/login");
       }
     })();
   }, [query.isFetched, query.isError, query.data, router, isActivating]);

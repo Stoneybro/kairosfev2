@@ -43,7 +43,7 @@ export async function simulateContract(params: {
   address: `0x${string}`;
   abi: Abi;
   functionName: string;
-  account?: `0x${string}`; // optional for better simulation
+  account?: `0x${string}`; 
   args?: any[];
 }) {
   return publicClient.simulateContract({
@@ -73,7 +73,6 @@ export async function waitForTransactionReceipt(params: {
 
 /**
  * Server-side event watcher. Returns unsubscribe function.
- * Use only in long-running server processes (workers) or for on-demand short watchers.
  */
 export function watchContractEvent(params: {
   chainId: number;

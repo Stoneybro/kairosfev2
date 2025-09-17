@@ -1,6 +1,5 @@
 "use client"
 import {QRCodeCanvas} from "qrcode.react"
-import { Copy } from 'lucide-react';
 import CopyText from '../ui/copy';
 
 export default function WalletRecieve () {

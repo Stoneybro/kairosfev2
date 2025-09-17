@@ -5,6 +5,7 @@ import { CONTRACT_ADDRESSES, KAIROSFAUCET_ABI, SMART_ACCOUNT_ABI } from "@/lib/c
 import { useSmartAccountContext } from "@/lib/smartAccountProvider";
 import { toast } from "sonner";
 
+// Hook for claiming faucet ETH 
 export default function useFaucetClaim(smartAccount: `0x${string}`) {
   const qc = useQueryClient();
   const { getClient } = useSmartAccountContext();
@@ -12,18 +13,22 @@ export default function useFaucetClaim(smartAccount: `0x${string}`) {
   async function faucetClaim() {
     try {
       const smartAccountClient = await getClient();
-      if (!smartAccountClient) {
-        throw new Error("Smart Account Client is not initialized");
-      }
-      const faucetCallData=encodeFunctionData({
-        abi:KAIROSFAUCET_ABI,
-        functionName:"claimETH"
-      })
-      const callData=encodeFunctionData({
-        abi:SMART_ACCOUNT_ABI,
-        functionName:"execute",
-        args:[CONTRACT_ADDRESSES.FAUCET,0n,faucetCallData]
-      })
+      if (!smartAccountClient) throw new Error("Smart Account Client is not initialized");
+
+      // Encode faucet "claimETH" call
+      const faucetCallData = encodeFunctionData({
+        abi: KAIROSFAUCET_ABI,
+        functionName: "claimETH",
+      });
+
+      // Wrap faucet call in smart account "execute"
+      const callData = encodeFunctionData({
+        abi: SMART_ACCOUNT_ABI,
+        functionName: "execute",
+        args: [CONTRACT_ADDRESSES.FAUCET, 0n, faucetCallData],
+      });
+
+      // Send user operation
       const hash = await smartAccountClient.sendUserOperation({
         account: smartAccountClient.account,
         calls: [
@@ -34,12 +39,16 @@ export default function useFaucetClaim(smartAccount: `0x${string}`) {
           },
         ],
       });
+
       await smartAccountClient.waitForUserOperationReceipt({ hash });
       toast.success("Faucet claimed successfully!");
-       qc.invalidateQueries({ queryKey: ["tasks", smartAccount] });
+
+      // Refresh related queries
+      qc.invalidateQueries({ queryKey: ["tasks", smartAccount] });
       qc.invalidateQueries({ queryKey: ["dashboardBalance", smartAccount] });
-      qc.invalidateQueries({ queryKey: ["taskCount",smartAccount] });
+      qc.invalidateQueries({ queryKey: ["taskCount", smartAccount] });
       qc.invalidateQueries({ queryKey: ["wallet-activity", smartAccount] });
+
       return true;
     } catch (error) {
       console.log("Error claiming faucet", error);
@@ -48,5 +57,5 @@ export default function useFaucetClaim(smartAccount: `0x${string}`) {
     }
   }
 
-  return  faucetClaim ;
+  return faucetClaim;
 }

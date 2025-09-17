@@ -1,6 +1,7 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
-import { TaskStatus, TaskTableData } from "@/types";
+import {  TaskTableData } from "@/types";
+import { TaskStatus } from "@/utils/constants";
 import { Badge } from "../../ui/badge";
 
 export const columns: ColumnDef<TaskTableData>[] = [
