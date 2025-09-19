@@ -5,7 +5,9 @@ A Next.js application providing a seamless ERC-4337 account abstraction interfac
 For the full technical specification, see 📄 [Technical Specification](SPECIFICATION.md)
 
 
-<img width="2880" height="1622" alt="www usekairos xyz_dashboard (1)" src="https://github.com/user-attachments/assets/57edcb75-cd77-49ba-b3dc-aaffbc29e538" />
+https://github.com/user-attachments/assets/4352f475-3ace-40b9-8be0-787e5b81d114
+
+
 
 ## Overview
 
