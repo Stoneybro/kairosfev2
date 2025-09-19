@@ -404,10 +404,9 @@ onSuccess: () => {
 ## Known Limitations
 
 ### Current Constraints
-- **Single Chain Support**: Currently limited to Base Sepolia
-- **Privy Dependency**: Locked to Privy's authentication infrastructure  
-- **Pimlico Integration**: Bundler and paymaster tied to single provider
-- **No Offline Support**: Requires network connectivity for all operations
+- **Single Chain and token Support**: Currently limited to Base Sepolia 
+- **Single token Support**: Currently limited to Base Sepolia eth
+- **Manual Task verification**
 
 ### Planned Improvements
 - Multi-chain support 
