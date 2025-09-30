@@ -2,6 +2,7 @@
 
 A Next.js application providing a seamless ERC-4337 account abstraction interface for personal accountability task management. Users interact through smart accounts with gasless transactions, social authentication, and automated task enforcement.
 
+For the contracts repo see [Kairos Contract](https://github.com/Stoneybro/kairos-contract)
 For the full technical specification, see 📄 [Technical Specification](SPECIFICATION.md)
 
 
